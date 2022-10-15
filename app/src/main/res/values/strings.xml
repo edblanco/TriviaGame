@@ -9,4 +9,18 @@
     <string name="incorrect">Incorrect</string>
     <string name="placeholder">This is a very long placeholder. Please always replace this text with the actual text to be used</string>
     <string name="out_of_text_placeholders">Question: %d/%d</string>
+    <string name="network_error_popup_title">Network error! (%d)</string>
+    <string name="network_error_popup_msg">A network error occurred.
+        \nDo you want to retry or close the App</string>
+    <string name="network_error_popup_positive_msg">Retry</string>
+    <string name="network_error_popup_negative_msg">Close App</string>
+    <string name="game_over_popup_title">Game over!</string>
+    <string name="game_over_popup_msg">Correct answers %d/%d
+        \nScore %d%%
+        \nWould you like to start a new game or repeat this game (same questions)?"</string>
+    <string name="game_over_popup_positive_msg">New</string>
+    <string name="game_over_popup_negative_msg">Repeat</string>
+    <string name="game_over_overlay">Game is over. Correct answer %d/%d</string>
+    <string name="right_question_overlay">Your answers was %b</string>
+
 </resources>
