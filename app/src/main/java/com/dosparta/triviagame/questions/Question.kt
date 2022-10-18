@@ -1,4 +1,4 @@
-package com.dosparta.triviagame
+package com.dosparta.triviagame.questions
 
 data class Question(
     val category: String,

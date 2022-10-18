@@ -1,4 +1,4 @@
-package com.dosparta.triviagame
+package com.dosparta.triviagame.common
 
 class Utils {
     companion object {

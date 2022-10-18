@@ -1,4 +1,4 @@
-package com.dosparta.triviagame
+package com.dosparta.triviagame.screens.trivia
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -16,13 +16,19 @@ import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
+import com.dosparta.triviagame.R
+import com.dosparta.triviagame.common.Utils
+import com.dosparta.triviagame.networking.schemas.QuestionsSchema
+import com.dosparta.triviagame.networking.VolleySingleton
+import com.dosparta.triviagame.questions.Answer
+import com.dosparta.triviagame.questions.Question
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
-class MainActivity : AppCompatActivity(), OnCorrectAnswerListener {
+class TriviaGameActivity : AppCompatActivity(), OnCorrectAnswerListener {
 
-    private val tag = MainActivity::class.java.simpleName
+    private val tag = TriviaGameActivity::class.java.simpleName
 
     private val questions: MutableList<Question> = mutableListOf()
     private var parentLayout: ConstraintLayout? = null
@@ -88,7 +94,7 @@ class MainActivity : AppCompatActivity(), OnCorrectAnswerListener {
             .setMessage(R.string.network_error_popup_msg)
             .setPositiveButton(R.string.network_error_popup_positive_msg) { dialog, _ ->
                 dialog.dismiss()
-                startActivity(Intent(this, MainActivity::class.java))
+                startActivity(Intent(this, TriviaGameActivity::class.java))
                 finish()
             }
             .setNegativeButton(R.string.network_error_popup_negative_msg) { dialog, _ ->
@@ -170,12 +176,12 @@ class MainActivity : AppCompatActivity(), OnCorrectAnswerListener {
         val correctAnswersOverTotal = (correctAnswers * HUNDRED_PERCENT) / questions.size
         builder.setTitle(R.string.game_over_popup_title)
             .setMessage(getString(R.string.game_over_popup_msg, correctAnswers, questions.size, correctAnswersOverTotal))
-            .setPositiveButton(R.string.game_over_popup_positive_msg) {dialog, _ ->
+            .setPositiveButton(R.string.game_over_popup_positive_msg) { dialog, _ ->
                 dialog.dismiss()
-                startActivity(Intent(this, MainActivity::class.java))
+                startActivity(Intent(this, TriviaGameActivity::class.java))
                 finish()
             }
-            .setNegativeButton(R.string.game_over_popup_negative_msg){dialog, _ ->
+            .setNegativeButton(R.string.game_over_popup_negative_msg){ dialog, _ ->
                 dialog.dismiss()
                 resetGame()
             }

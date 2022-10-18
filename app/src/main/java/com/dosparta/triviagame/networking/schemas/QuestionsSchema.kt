@@ -1,4 +1,4 @@
-package com.dosparta.triviagame
+package com.dosparta.triviagame.networking.schemas
 
 import kotlinx.serialization.Serializable
 

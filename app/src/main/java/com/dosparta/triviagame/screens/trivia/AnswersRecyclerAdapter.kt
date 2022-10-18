@@ -1,12 +1,12 @@
-package com.dosparta.triviagame
+package com.dosparta.triviagame.screens.trivia
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.recyclerview.widget.RecyclerView
-
-private const val HIGHLIGHT_CORRECT_ANSWER = "HIGHLIGHT_CORRECT_ANSWER"
+import com.dosparta.triviagame.R
+import com.dosparta.triviagame.questions.Answer
 
 class AnswersRecyclerAdapter(private val answers: List<Answer>, private val listener: OnCorrectAnswerListener) :
     RecyclerView.Adapter<AnswersRecyclerAdapter.ViewHolder>() {
@@ -68,8 +68,8 @@ class AnswersRecyclerAdapter(private val answers: List<Answer>, private val list
             questionButton = view.findViewById(R.id.button_question)
         }
     }
-}
 
-interface OnCorrectAnswerListener{
-    fun onCorrect(isCorrect: Boolean)
+    companion object {
+        private const val HIGHLIGHT_CORRECT_ANSWER = "HIGHLIGHT_CORRECT_ANSWER"
+    }
 }

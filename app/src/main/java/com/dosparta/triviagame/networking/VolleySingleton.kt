@@ -1,4 +1,4 @@
-package com.dosparta.triviagame
+package com.dosparta.triviagame.networking
 
 import android.content.Context
 import android.graphics.Bitmap
