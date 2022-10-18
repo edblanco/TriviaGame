@@ -14,6 +14,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.android.volley.Request
+import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.serialization.decodeFromString
@@ -59,8 +60,7 @@ class MainActivity : AppCompatActivity(), OnCorrectAnswerListener {
         val stringRequest = StringRequest(Request.Method.GET, Utils.TRIVIA_API_URL, { response ->
             onQuestionsReceived(response)
         }, {
-            Log.i(tag, "Unable to retrieve data: ${it.networkResponse}")
-            showErrorDialog(if (it.networkResponse != null) it.networkResponse.statusCode else Utils.INTERNAL_SERVER_ERROR)
+            onNetworkCallFailed(it)
         })
         VolleySingleton.getInstance(this).addToRequestQueue(stringRequest)
     }
@@ -75,6 +75,11 @@ class MainActivity : AppCompatActivity(), OnCorrectAnswerListener {
         fillQuestionList(response)
         presentQuestion()
         setLoadingState(false)
+    }
+
+    private fun onNetworkCallFailed(it: VolleyError) {
+        Log.i(tag, "Unable to retrieve data: ${it.networkResponse}")
+        showErrorDialog(if (it.networkResponse != null) it.networkResponse.statusCode else Utils.INTERNAL_SERVER_ERROR)
     }
 
     private fun showErrorDialog(statusCode: Int) {
