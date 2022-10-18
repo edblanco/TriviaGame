@@ -12,4 +12,6 @@
     <color name="cardViewBackgroundTint">#1B213A</color>
     <color name="hunter_green">#355E3B</color>
     <color name="blood_red">#880808</color>
+    <color name="main_background_color">#141A33</color>
+    <color name="button_background_tint">#6D101326</color>
 </resources>

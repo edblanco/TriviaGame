@@ -5,7 +5,7 @@
     android:id="@+id/parent_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#141A33"
+    android:background="@color/main_background_color"
     tools:context=".MainActivity">
 
     <TextView
@@ -33,7 +33,7 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/card_view"
         android:layout_width="match_parent"
-        android:layout_height="153dp"
+        android:layout_height="@dimen/question_card_height"
         android:layout_marginStart="16dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="16dp"
