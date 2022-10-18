@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity(), OnCorrectAnswerListener {
 
     private fun setLoadingState(loading: Boolean) {
         loadingBar?.visibility = if (loading) View.VISIBLE else View.GONE
-        parentLayout?.alpha = if (loading) 0.5f else 1.0f
+        parentLayout?.alpha = if (loading) ALPHA_FIFTY_PERCENT else ALPHA_HUNDRED_PERCENT
     }
 
     private fun onQuestionsReceived(response: String) {
@@ -162,7 +162,7 @@ class MainActivity : AppCompatActivity(), OnCorrectAnswerListener {
 
     private fun showResults() {
         val builder = AlertDialog.Builder(this)
-        val correctAnswersOverTotal = (correctAnswers * 100) / questions.size
+        val correctAnswersOverTotal = (correctAnswers * HUNDRED_PERCENT) / questions.size
         builder.setTitle(R.string.game_over_popup_title)
             .setMessage(getString(R.string.game_over_popup_msg, correctAnswers, questions.size, correctAnswersOverTotal))
             .setPositiveButton(R.string.game_over_popup_positive_msg) {dialog, _ ->
@@ -188,5 +188,8 @@ class MainActivity : AppCompatActivity(), OnCorrectAnswerListener {
 
     companion object {
         private const val JUMP_TO_NEXT_QUESTION_DELAY = 3000L
+        private const val HUNDRED_PERCENT = 100
+        private const val ALPHA_HUNDRED_PERCENT = 1.0f
+        private const val ALPHA_FIFTY_PERCENT = 0.5f
     }
 }
