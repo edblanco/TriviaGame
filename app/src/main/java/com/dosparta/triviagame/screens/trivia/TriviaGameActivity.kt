@@ -1,59 +1,42 @@
 package com.dosparta.triviagame.screens.trivia
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.text.Html
 import android.util.Log
-import android.view.View
-import android.widget.ProgressBar
-import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import android.view.LayoutInflater
+import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import com.dosparta.triviagame.R
 import com.dosparta.triviagame.common.Utils
-import com.dosparta.triviagame.networking.schemas.QuestionsSchema
 import com.dosparta.triviagame.networking.VolleySingleton
+import com.dosparta.triviagame.networking.schemas.QuestionsSchema
 import com.dosparta.triviagame.questions.Answer
 import com.dosparta.triviagame.questions.Question
+import com.dosparta.triviagame.screens.common.AlertDialogListener
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
-class TriviaGameActivity : AppCompatActivity(), OnCorrectAnswerListener {
+class TriviaGameActivity : AppCompatActivity(), TriviaGameViewMvc.Listener {
 
     private val tag = TriviaGameActivity::class.java.simpleName
 
     private val questions: MutableList<Question> = mutableListOf()
-    private var parentLayout: ConstraintLayout? = null
-    private var questionTitleTv: TextView? = null
-    private var questionTv: TextView? = null
-    private var loadingBar: ProgressBar? = null
-    private var answersRecyclerView: RecyclerView? = null
-    private var answersRecyclerAdapter: AnswersRecyclerAdapter? = null
     private var currentQuestion: Int = 0
     private var correctAnswers: Int = 0
 
+    private var viewMvc: TriviaGameViewMvc? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
-        attachUI()
-    }
-
-    private fun attachUI() {
-        parentLayout = findViewById(R.id.parent_layout)
-        questionTitleTv = findViewById(R.id.text_view_out_of)
-        questionTv = findViewById(R.id.question_textview)
-        loadingBar = findViewById(R.id.loading_bar)
-        answersRecyclerView = findViewById(R.id.answers_recycler_view)
-        answersRecyclerView?.layoutManager = LinearLayoutManager(this)
+        viewMvc = TriviaGameViewMvc(LayoutInflater.from(this), null)
+        setContentView(viewMvc!!.getRootView())
+        viewMvc!!.registerListener(this)
     }
 
     override fun onStart() {
@@ -62,7 +45,7 @@ class TriviaGameActivity : AppCompatActivity(), OnCorrectAnswerListener {
     }
 
     private fun loadQuestions() {
-        setLoadingState(true)
+        viewMvc?.setLoadingState(true)
         val stringRequest = StringRequest(Request.Method.GET, Utils.TRIVIA_API_URL, { response ->
             onQuestionsReceived(response)
         }, {
@@ -71,16 +54,11 @@ class TriviaGameActivity : AppCompatActivity(), OnCorrectAnswerListener {
         VolleySingleton.getInstance(this).addToRequestQueue(stringRequest)
     }
 
-    private fun setLoadingState(loading: Boolean) {
-        loadingBar?.visibility = if (loading) View.VISIBLE else View.GONE
-        parentLayout?.alpha = if (loading) ALPHA_FIFTY_PERCENT else ALPHA_HUNDRED_PERCENT
-    }
-
     private fun onQuestionsReceived(response: String) {
         Log.i(tag, "Response (first 500 chars): ${response.substring(0, 500)}")
         fillQuestionList(response)
-        presentQuestion()
-        setLoadingState(false)
+        viewMvc?.presentQuestion(currentQuestion, questions)
+        viewMvc?.setLoadingState(false)
     }
 
     private fun onNetworkCallFailed(it: VolleyError) {
@@ -89,32 +67,24 @@ class TriviaGameActivity : AppCompatActivity(), OnCorrectAnswerListener {
     }
 
     private fun showErrorDialog(statusCode: Int) {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle(getString(R.string.network_error_popup_title, statusCode))
-            .setMessage(R.string.network_error_popup_msg)
-            .setPositiveButton(R.string.network_error_popup_positive_msg) { dialog, _ ->
-                dialog.dismiss()
-                startActivity(Intent(this, TriviaGameActivity::class.java))
+        val answerListener = object: AlertDialogListener {
+            override fun onPositiveAnswer() {
+                startActivity(Intent(this@TriviaGameActivity, TriviaGameActivity::class.java))
                 finish()
             }
-            .setNegativeButton(R.string.network_error_popup_negative_msg) { dialog, _ ->
-                dialog.dismiss()
+
+            override fun onNegativeAnswer() {
+                resetGame()
                 finishAffinity()
             }
-            .setCancelable(false)
-            .show()
+        }
+        viewMvc?.showErrorDialog(statusCode, answerListener)
     }
 
     private fun fillQuestionList(response: String) {
         val jsonData = Json.decodeFromString<QuestionsSchema>(response)
         questions.addAll(questionsSchemaToQuestions(jsonData))
         Log.i(tag, "onStart: $jsonData")
-    }
-
-    private fun presentQuestion() {
-        questionTitleTv?.text = getString(R.string.out_of_text_placeholders, currentQuestion + 1, questions.size)
-        questionTv?.text = questions[currentQuestion].question
-        initAdapter(currentQuestion)
     }
 
     private fun questionsSchemaToQuestions(questionsSchema: QuestionsSchema) : List<Question>
@@ -140,19 +110,6 @@ class TriviaGameActivity : AppCompatActivity(), OnCorrectAnswerListener {
         return questionList
     }
 
-    private fun initAdapter(questionPos: Int) {
-        answersRecyclerAdapter = AnswersRecyclerAdapter(questions[questionPos].answers, this)
-        answersRecyclerView?.adapter = answersRecyclerAdapter
-    }
-
-    override fun onCorrect(isCorrect: Boolean) {
-        Snackbar.make(window.decorView.rootView, getString(R.string.right_question_overlay, isCorrect), Snackbar.LENGTH_SHORT).show()
-        if (isCorrect){
-            ++correctAnswers
-        }
-        moveToNextQuestionWithDelay()
-    }
-
     private fun moveToNextQuestionWithDelay() {
         val handler = Handler(mainLooper)
         handler.postDelayed({
@@ -168,39 +125,42 @@ class TriviaGameActivity : AppCompatActivity(), OnCorrectAnswerListener {
             return
         }
         ++currentQuestion
-        presentQuestion()
+        viewMvc?.presentQuestion(currentQuestion, questions)
     }
 
     private fun showResults() {
-        val builder = AlertDialog.Builder(this)
-        val correctAnswersOverTotal = (correctAnswers * HUNDRED_PERCENT) / questions.size
-        builder.setTitle(R.string.game_over_popup_title)
-            .setMessage(getString(R.string.game_over_popup_msg, correctAnswers, questions.size, correctAnswersOverTotal))
-            .setPositiveButton(R.string.game_over_popup_positive_msg) { dialog, _ ->
-                dialog.dismiss()
-                startActivity(Intent(this, TriviaGameActivity::class.java))
+        val answerListener = object: AlertDialogListener {
+            override fun onPositiveAnswer() {
+                startActivity(Intent(this@TriviaGameActivity, TriviaGameActivity::class.java))
                 finish()
             }
-            .setNegativeButton(R.string.game_over_popup_negative_msg){ dialog, _ ->
-                dialog.dismiss()
+
+            override fun onNegativeAnswer() {
                 resetGame()
             }
-            .setCancelable(false)
-            .show()
+        }
+        viewMvc?.showResults(correctAnswers, questions.size, answerListener)
     }
 
     private fun resetGame() {
         correctAnswers = 0
         currentQuestion = 0
-        questionTitleTv?.text = getString(R.string.out_of_text_placeholders, currentQuestion + 1, questions.size)
-        questionTv?.text = questions[currentQuestion].question
-        initAdapter(currentQuestion)
+        viewMvc?.presentQuestion(currentQuestion, questions)
     }
 
     companion object {
         private const val JUMP_TO_NEXT_QUESTION_DELAY = 3000L
-        private const val HUNDRED_PERCENT = 100
-        private const val ALPHA_HUNDRED_PERCENT = 1.0f
-        private const val ALPHA_FIFTY_PERCENT = 0.5f
+    }
+
+    override fun onAnswerClicked(isCorrect: Boolean) {
+        if (isCorrect){
+            ++correctAnswers
+        }
+        moveToNextQuestionWithDelay()
+    }
+
+    override fun onDestroy() {
+        viewMvc!!.removeListener(this)
+        super.onDestroy()
     }
 }
