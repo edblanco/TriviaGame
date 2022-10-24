@@ -29,14 +29,15 @@ class TriviaGameActivity : AppCompatActivity(), TriviaGameViewMvc.Listener {
     private var currentQuestion: Int = 0
     private var correctAnswers: Int = 0
 
-    private var viewMvc: TriviaGameViewMvc? = null
+    private var _viewMvc: TriviaGameViewMvc? = null
+    private val viewMvc get() = _viewMvc!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        viewMvc = TriviaGameViewMvc(LayoutInflater.from(this), null)
-        setContentView(viewMvc!!.getRootView())
-        viewMvc!!.registerListener(this)
+        _viewMvc = TriviaGameViewMvc(LayoutInflater.from(this), null)
+        setContentView(viewMvc.getRootView())
+        viewMvc.registerListener(this)
     }
 
     override fun onStart() {
@@ -45,7 +46,7 @@ class TriviaGameActivity : AppCompatActivity(), TriviaGameViewMvc.Listener {
     }
 
     private fun loadQuestions() {
-        viewMvc?.setLoadingState(true)
+        viewMvc.setLoadingState(true)
         val stringRequest = StringRequest(Request.Method.GET, Utils.TRIVIA_API_URL, { response ->
             onQuestionsReceived(response)
         }, {
@@ -57,8 +58,8 @@ class TriviaGameActivity : AppCompatActivity(), TriviaGameViewMvc.Listener {
     private fun onQuestionsReceived(response: String) {
         Log.i(tag, "Response (first 500 chars): ${response.substring(0, 500)}")
         fillQuestionList(response)
-        viewMvc?.presentQuestion(currentQuestion, questions)
-        viewMvc?.setLoadingState(false)
+        viewMvc.presentQuestion(currentQuestion, questions)
+        viewMvc.setLoadingState(false)
     }
 
     private fun onNetworkCallFailed(it: VolleyError) {
@@ -78,7 +79,7 @@ class TriviaGameActivity : AppCompatActivity(), TriviaGameViewMvc.Listener {
                 finishAffinity()
             }
         }
-        viewMvc?.showErrorDialog(statusCode, answerListener)
+        viewMvc.showErrorDialog(statusCode, answerListener)
     }
 
     private fun fillQuestionList(response: String) {
@@ -125,7 +126,7 @@ class TriviaGameActivity : AppCompatActivity(), TriviaGameViewMvc.Listener {
             return
         }
         ++currentQuestion
-        viewMvc?.presentQuestion(currentQuestion, questions)
+        viewMvc.presentQuestion(currentQuestion, questions)
     }
 
     private fun showResults() {
@@ -139,17 +140,13 @@ class TriviaGameActivity : AppCompatActivity(), TriviaGameViewMvc.Listener {
                 resetGame()
             }
         }
-        viewMvc?.showResults(correctAnswers, questions.size, answerListener)
+        viewMvc.showResults(correctAnswers, questions.size, answerListener)
     }
 
     private fun resetGame() {
         correctAnswers = 0
         currentQuestion = 0
-        viewMvc?.presentQuestion(currentQuestion, questions)
-    }
-
-    companion object {
-        private const val JUMP_TO_NEXT_QUESTION_DELAY = 3000L
+        viewMvc.presentQuestion(currentQuestion, questions)
     }
 
     override fun onAnswerClicked(isCorrect: Boolean) {
@@ -160,7 +157,11 @@ class TriviaGameActivity : AppCompatActivity(), TriviaGameViewMvc.Listener {
     }
 
     override fun onDestroy() {
-        viewMvc!!.removeListener(this)
+        viewMvc.removeListener(this)
         super.onDestroy()
+    }
+
+    companion object {
+        private const val JUMP_TO_NEXT_QUESTION_DELAY = 3000L
     }
 }

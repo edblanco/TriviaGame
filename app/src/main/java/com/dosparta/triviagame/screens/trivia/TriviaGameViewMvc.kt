@@ -17,7 +17,7 @@ import com.google.android.material.snackbar.Snackbar
 
 class TriviaGameViewMvc(inflater: LayoutInflater, parent: ViewGroup?) : OnCorrectAnswerListener {
 
-    public interface Listener{
+    interface Listener{
         fun onAnswerClicked(isCorrect: Boolean)
     }
 
@@ -116,7 +116,6 @@ class TriviaGameViewMvc(inflater: LayoutInflater, parent: ViewGroup?) : OnCorrec
     }
 
     companion object {
-        private const val JUMP_TO_NEXT_QUESTION_DELAY = 3000L
         private const val HUNDRED_PERCENT = 100
         private const val ALPHA_HUNDRED_PERCENT = 1.0f
         private const val ALPHA_FIFTY_PERCENT = 0.5f
