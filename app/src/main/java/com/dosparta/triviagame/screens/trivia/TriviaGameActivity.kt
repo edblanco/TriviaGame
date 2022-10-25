@@ -21,7 +21,7 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
-class TriviaGameActivity : AppCompatActivity(), TriviaGameViewMvc.Listener {
+class TriviaGameActivity : AppCompatActivity(), ITriviaGameViewMvc.Listener {
 
     private val tag = TriviaGameActivity::class.java.simpleName
 
@@ -29,7 +29,7 @@ class TriviaGameActivity : AppCompatActivity(), TriviaGameViewMvc.Listener {
     private var currentQuestion: Int = 0
     private var correctAnswers: Int = 0
 
-    private var _viewMvc: TriviaGameViewMvc? = null
+    private var _viewMvc: ITriviaGameViewMvc? = null
     private val viewMvc get() = _viewMvc!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,7 +58,7 @@ class TriviaGameActivity : AppCompatActivity(), TriviaGameViewMvc.Listener {
     private fun onQuestionsReceived(response: String) {
         Log.i(tag, "Response (first 500 chars): ${response.substring(0, 500)}")
         fillQuestionList(response)
-        viewMvc.presentQuestion(currentQuestion, questions)
+        viewMvc.bindQuestions(currentQuestion, questions)
         viewMvc.setLoadingState(false)
     }
 
@@ -126,7 +126,7 @@ class TriviaGameActivity : AppCompatActivity(), TriviaGameViewMvc.Listener {
             return
         }
         ++currentQuestion
-        viewMvc.presentQuestion(currentQuestion, questions)
+        viewMvc.bindQuestions(currentQuestion, questions)
     }
 
     private fun showResults() {
@@ -146,7 +146,7 @@ class TriviaGameActivity : AppCompatActivity(), TriviaGameViewMvc.Listener {
     private fun resetGame() {
         correctAnswers = 0
         currentQuestion = 0
-        viewMvc.presentQuestion(currentQuestion, questions)
+        viewMvc.bindQuestions(currentQuestion, questions)
     }
 
     override fun onAnswerClicked(isCorrect: Boolean) {
@@ -157,7 +157,7 @@ class TriviaGameActivity : AppCompatActivity(), TriviaGameViewMvc.Listener {
     }
 
     override fun onDestroy() {
-        viewMvc.removeListener(this)
+        viewMvc.unregisterListener(this)
         super.onDestroy()
     }
 

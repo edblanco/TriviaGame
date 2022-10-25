@@ -14,12 +14,10 @@ import com.dosparta.triviagame.R
 import com.dosparta.triviagame.questions.Question
 import com.dosparta.triviagame.screens.common.AlertDialogListener
 import com.google.android.material.snackbar.Snackbar
+import com.dosparta.triviagame.screens.trivia.ITriviaGameViewMvc.Listener
 
-class TriviaGameViewMvc(inflater: LayoutInflater, parent: ViewGroup?) : OnCorrectAnswerListener {
-
-    interface Listener{
-        fun onAnswerClicked(isCorrect: Boolean)
-    }
+class TriviaGameViewMvc(inflater: LayoutInflater, parent: ViewGroup?) : OnCorrectAnswerListener,
+    ITriviaGameViewMvc {
 
     private var rootView: View?
 
@@ -37,14 +35,6 @@ class TriviaGameViewMvc(inflater: LayoutInflater, parent: ViewGroup?) : OnCorrec
         attachUI()
     }
 
-    fun registerListener(listener: Listener){
-        listeners.add(listener)
-    }
-
-    fun removeListener(listener: Listener){
-        listeners.remove(listener)
-    }
-
     private fun attachUI() {
         parentLayout = findViewById(R.id.parent_layout)
         questionTitleTv = findViewById(R.id.text_view_out_of)
@@ -58,20 +48,28 @@ class TriviaGameViewMvc(inflater: LayoutInflater, parent: ViewGroup?) : OnCorrec
         return getRootView().findViewById(id)
     }
 
+    override fun getRootView(): View {
+        return rootView!!
+    }
+
+    override fun registerListener(listener: Listener){
+        listeners.add(listener)
+    }
+
+    override fun unregisterListener(listener: Listener){
+        listeners.remove(listener)
+    }
+
     private fun getContext(): Context{
         return getRootView().context
     }
 
-    fun getRootView(): View {
-        return rootView!!
-    }
-
-    fun setLoadingState(loading: Boolean) {
+    override fun setLoadingState(loading: Boolean) {
         loadingBar?.visibility = if (loading) View.VISIBLE else View.GONE
         parentLayout?.alpha = if (loading) ALPHA_FIFTY_PERCENT else ALPHA_HUNDRED_PERCENT
     }
 
-    fun presentQuestion(currentQuestion: Int, questions: List<Question>) {
+    override fun bindQuestions(currentQuestion: Int, questions: List<Question>) {
         questionTitleTv?.text = getContext().getString(R.string.out_of_text_placeholders, currentQuestion + 1, questions.size)
         questionTv?.text = questions[currentQuestion].question
         initAdapter(currentQuestion, questions)
@@ -82,7 +80,7 @@ class TriviaGameViewMvc(inflater: LayoutInflater, parent: ViewGroup?) : OnCorrec
         answersRecyclerView?.adapter = answersRecyclerAdapter
     }
 
-    fun showResults(correctAnswers: Int, totalAnswers: Int, answerListener: AlertDialogListener) {
+    override fun showResults(correctAnswers: Int, totalAnswers: Int, answerListener: AlertDialogListener) {
         val builder = AlertDialog.Builder(getContext())
         val correctAnswersOverTotal = (correctAnswers * HUNDRED_PERCENT) / totalAnswers
         builder.setTitle(R.string.game_over_popup_title)
@@ -99,7 +97,7 @@ class TriviaGameViewMvc(inflater: LayoutInflater, parent: ViewGroup?) : OnCorrec
             .show()
     }
 
-    fun showErrorDialog(statusCode: Int, answerListener: AlertDialogListener) {
+    override fun showErrorDialog(statusCode: Int, answerListener: AlertDialogListener) {
         val builder = AlertDialog.Builder(getContext())
         builder.setTitle(getContext().getString(R.string.network_error_popup_title, statusCode))
             .setMessage(R.string.network_error_popup_msg)
@@ -115,16 +113,16 @@ class TriviaGameViewMvc(inflater: LayoutInflater, parent: ViewGroup?) : OnCorrec
             .show()
     }
 
-    companion object {
-        private const val HUNDRED_PERCENT = 100
-        private const val ALPHA_HUNDRED_PERCENT = 1.0f
-        private const val ALPHA_FIFTY_PERCENT = 0.5f
-    }
-
     override fun onCorrect(isCorrect: Boolean) {
         Snackbar.make(getRootView(), getContext().getString(R.string.right_question_overlay, isCorrect), Snackbar.LENGTH_SHORT).show()
         for (listener in listeners){
             listener.onAnswerClicked(isCorrect)
         }
+    }
+
+    companion object {
+        private const val HUNDRED_PERCENT = 100
+        private const val ALPHA_HUNDRED_PERCENT = 1.0f
+        private const val ALPHA_FIFTY_PERCENT = 0.5f
     }
 }
