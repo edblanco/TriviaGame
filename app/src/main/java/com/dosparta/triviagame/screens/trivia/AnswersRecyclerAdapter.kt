@@ -9,33 +9,29 @@ import com.dosparta.triviagame.R
 import com.dosparta.triviagame.questions.Answer
 
 class AnswersRecyclerAdapter(private val answers: List<Answer>, private val listener: OnCorrectAnswerListener) :
-    RecyclerView.Adapter<AnswersRecyclerAdapter.ViewHolder>() {
+    RecyclerView.Adapter<AnswersRecyclerAdapter.ViewHolder>(), IAnswersItemViewMvc.Listener {
+
+    private var _answersItemViewMvc: IAnswersItemViewMvc? = null
+    private val answersItemViewMvc get() = _answersItemViewMvc!!
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.question_row_item, parent, false)
+        _answersItemViewMvc = AnswersItemViewMvc(LayoutInflater.from(parent.context), parent)
+        answersItemViewMvc.registerListener(this)
 
-        return ViewHolder(view)
+        return ViewHolder(answersItemViewMvc.getRootView())
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.questionButton.text = answers.elementAt(position).answer
-        holder.questionButton.setOnClickListener {
-            handleButtonClicked(position, holder)
-        }
+        val answer = answers.elementAt(position)
+        answersItemViewMvc.bindAnswer(answer, holder)
     }
 
-    private fun handleButtonClicked(position: Int, holder: ViewHolder) {
-        val isCorrect = answers.elementAt(position).correct
-        updateTintColor(holder, isCorrect)
+    override fun onAnswerClicked(answer: Answer, holder: ViewHolder) {
+        val isCorrect = answer.correct
+        answersItemViewMvc.updateTintColor(holder, isCorrect)
         if (!isCorrect)
             updateCorrectQuestion()
         listener.onCorrect(isCorrect)
-    }
-
-    private fun updateTintColor(holder: ViewHolder, isCorrect: Boolean) {
-        val context = holder.questionButton.context
-        val color = if (isCorrect) R.color.hunter_green else R.color.blood_red
-        holder.questionButton.backgroundTintList = context.resources.getColorStateList(color, null)
     }
 
     private fun updateCorrectQuestion() {
@@ -51,7 +47,7 @@ class AnswersRecyclerAdapter(private val answers: List<Answer>, private val list
         super.onBindViewHolder(holder, position, payloads)
         for (payload in payloads){
             if (payload is String && payload == HIGHLIGHT_CORRECT_ANSWER) {
-                updateTintColor(holder, true)
+                answersItemViewMvc.updateTintColor(holder, true)
                 break
             }
         }
@@ -59,6 +55,11 @@ class AnswersRecyclerAdapter(private val answers: List<Answer>, private val list
 
     override fun getItemCount(): Int {
         return answers.size
+    }
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        answersItemViewMvc.unregisterListener(this)
+        super.onDetachedFromRecyclerView(recyclerView)
     }
 
     class ViewHolder (view: View) : RecyclerView.ViewHolder(view) {
