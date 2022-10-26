@@ -49,6 +49,7 @@ class AnswersItemViewMvc(layoutInflater: LayoutInflater, parent: ViewGroup) : IA
     override fun bindAnswer(answer: Answer) {
         questionButton.text = answer.answer
         questionButton.setOnClickListener {
+            updateTintColor(answer.correct)
             for (listener in listeners) {
                 listener.onAnswerClicked(answer)
             }
