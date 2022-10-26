@@ -3,9 +3,7 @@ package com.dosparta.triviagame.screens.trivia
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.recyclerview.widget.RecyclerView
-import com.dosparta.triviagame.R
 import com.dosparta.triviagame.questions.Answer
 
 class AnswersRecyclerAdapter(private val answers: List<Answer>, private val listener: OnCorrectAnswerListener) :
@@ -23,8 +21,9 @@ class AnswersRecyclerAdapter(private val answers: List<Answer>, private val list
         holder.answersItemViewMvc.bindAnswer(answer)
     }
 
-    override fun onAnswerClicked(answer: Answer) {
+    override fun onAnswerClicked(answer: Answer, viewMvc: IAnswersItemViewMvc) {
         val isCorrect = answer.correct
+        viewMvc.updateTintColor(answer.correct)
         if (!isCorrect)
             updateCorrectQuestion()
         listener.onCorrect(isCorrect)

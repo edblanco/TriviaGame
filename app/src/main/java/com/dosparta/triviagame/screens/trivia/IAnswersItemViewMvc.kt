@@ -5,7 +5,7 @@ import com.dosparta.triviagame.questions.Answer
 
 interface IAnswersItemViewMvc {
     interface Listener {
-        fun onAnswerClicked(answer: Answer)
+        fun onAnswerClicked(answer: Answer, viewMvc: IAnswersItemViewMvc)
     }
     fun registerListener(listener: Listener)
     fun unregisterListener(listener: Listener)
