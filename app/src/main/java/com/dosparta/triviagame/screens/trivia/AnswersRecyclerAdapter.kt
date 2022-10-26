@@ -18,17 +18,17 @@ class AnswersRecyclerAdapter(private val answers: List<Answer>, private val list
         _answersItemViewMvc = AnswersItemViewMvc(LayoutInflater.from(parent.context), parent)
         answersItemViewMvc.registerListener(this)
 
-        return ViewHolder(answersItemViewMvc.getRootView())
+        return ViewHolder(answersItemViewMvc)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val answer = answers.elementAt(position)
-        answersItemViewMvc.bindAnswer(answer, holder)
+        answersItemViewMvc.bindAnswer(answer)
     }
 
-    override fun onAnswerClicked(answer: Answer, holder: ViewHolder) {
+    override fun onAnswerClicked(answer: Answer) {
         val isCorrect = answer.correct
-        answersItemViewMvc.updateTintColor(holder, isCorrect)
+        answersItemViewMvc.updateTintColor(isCorrect)
         if (!isCorrect)
             updateCorrectQuestion()
         listener.onCorrect(isCorrect)
@@ -47,7 +47,7 @@ class AnswersRecyclerAdapter(private val answers: List<Answer>, private val list
         super.onBindViewHolder(holder, position, payloads)
         for (payload in payloads){
             if (payload is String && payload == HIGHLIGHT_CORRECT_ANSWER) {
-                answersItemViewMvc.updateTintColor(holder, true)
+                answersItemViewMvc.updateTintColor(true)
                 break
             }
         }
@@ -62,11 +62,11 @@ class AnswersRecyclerAdapter(private val answers: List<Answer>, private val list
         super.onDetachedFromRecyclerView(recyclerView)
     }
 
-    class ViewHolder (view: View) : RecyclerView.ViewHolder(view) {
-        val questionButton: Button
+    class ViewHolder (viewMvc: IAnswersItemViewMvc) : RecyclerView.ViewHolder(viewMvc.getRootView()) {
+        private val viewMvc: IAnswersItemViewMvc
 
         init {
-            questionButton = view.findViewById(R.id.button_question)
+            this.viewMvc = viewMvc
         }
     }
 
