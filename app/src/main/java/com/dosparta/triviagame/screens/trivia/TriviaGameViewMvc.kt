@@ -13,13 +13,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dosparta.triviagame.R
 import com.dosparta.triviagame.questions.Question
 import com.dosparta.triviagame.screens.common.AlertDialogListener
+import com.dosparta.triviagame.screens.common.BaseViewMvc
 import com.google.android.material.snackbar.Snackbar
 import com.dosparta.triviagame.screens.trivia.ITriviaGameViewMvc.Listener
 
-class TriviaGameViewMvc(inflater: LayoutInflater, parent: ViewGroup?) : OnCorrectAnswerListener,
+class TriviaGameViewMvc(inflater: LayoutInflater, parent: ViewGroup?) : BaseViewMvc(), OnCorrectAnswerListener,
     ITriviaGameViewMvc {
-
-    private var rootView: View?
 
     private val listeners: MutableList<Listener> = mutableListOf()
 
@@ -31,7 +30,7 @@ class TriviaGameViewMvc(inflater: LayoutInflater, parent: ViewGroup?) : OnCorrec
     private var answersRecyclerView: RecyclerView? = null
 
     init {
-        rootView = inflater.inflate(R.layout.activity_main, parent, false)
+        setRootView(inflater.inflate(R.layout.activity_main, parent, false))
         attachUI()
     }
 
@@ -44,24 +43,12 @@ class TriviaGameViewMvc(inflater: LayoutInflater, parent: ViewGroup?) : OnCorrec
         answersRecyclerView?.layoutManager = LinearLayoutManager(getContext())
     }
 
-    private fun <T: View> findViewById(id: Int) : T?{
-        return getRootView().findViewById(id)
-    }
-
-    override fun getRootView(): View {
-        return rootView!!
-    }
-
     override fun registerListener(listener: Listener){
         listeners.add(listener)
     }
 
     override fun unregisterListener(listener: Listener){
         listeners.remove(listener)
-    }
-
-    private fun getContext(): Context{
-        return getRootView().context
     }
 
     override fun setLoadingState(loading: Boolean) {
