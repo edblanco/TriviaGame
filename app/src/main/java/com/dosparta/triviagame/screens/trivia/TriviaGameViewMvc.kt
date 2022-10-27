@@ -1,6 +1,5 @@
 package com.dosparta.triviagame.screens.trivia
 
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,14 +12,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dosparta.triviagame.R
 import com.dosparta.triviagame.questions.Question
 import com.dosparta.triviagame.screens.common.AlertDialogListener
-import com.dosparta.triviagame.screens.common.BaseViewMvc
+import com.dosparta.triviagame.screens.common.BaseObservableViewMvc
 import com.google.android.material.snackbar.Snackbar
 import com.dosparta.triviagame.screens.trivia.ITriviaGameViewMvc.Listener
 
-class TriviaGameViewMvc(inflater: LayoutInflater, parent: ViewGroup?) : BaseViewMvc(), OnCorrectAnswerListener,
+class TriviaGameViewMvc(inflater: LayoutInflater, parent: ViewGroup?) : BaseObservableViewMvc<Listener>(), OnCorrectAnswerListener,
     ITriviaGameViewMvc {
-
-    private val listeners: MutableList<Listener> = mutableListOf()
 
     private var answersRecyclerAdapter: AnswersRecyclerAdapter? = null
     private var parentLayout: ConstraintLayout? = null
@@ -41,14 +38,6 @@ class TriviaGameViewMvc(inflater: LayoutInflater, parent: ViewGroup?) : BaseView
         loadingBar = findViewById(R.id.loading_bar)
         answersRecyclerView = findViewById(R.id.answers_recycler_view)
         answersRecyclerView?.layoutManager = LinearLayoutManager(getContext())
-    }
-
-    override fun registerListener(listener: Listener){
-        listeners.add(listener)
-    }
-
-    override fun unregisterListener(listener: Listener){
-        listeners.remove(listener)
     }
 
     override fun setLoadingState(loading: Boolean) {
@@ -102,7 +91,7 @@ class TriviaGameViewMvc(inflater: LayoutInflater, parent: ViewGroup?) : BaseView
 
     override fun onCorrect(isCorrect: Boolean) {
         Snackbar.make(getRootView(), getContext().getString(R.string.right_question_overlay, isCorrect), Snackbar.LENGTH_SHORT).show()
-        for (listener in listeners){
+        for (listener in getListeners()){
             listener.onAnswerClicked(isCorrect)
         }
     }
