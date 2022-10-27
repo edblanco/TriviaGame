@@ -6,22 +6,21 @@ import android.os.Handler
 import android.text.Html
 import android.util.Log
 import android.view.LayoutInflater
-import androidx.appcompat.app.AppCompatActivity
 import com.android.volley.Request
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import com.dosparta.triviagame.R
 import com.dosparta.triviagame.common.Utils
-import com.dosparta.triviagame.networking.VolleySingleton
 import com.dosparta.triviagame.networking.schemas.QuestionsSchema
 import com.dosparta.triviagame.questions.Answer
 import com.dosparta.triviagame.questions.Question
 import com.dosparta.triviagame.screens.common.AlertDialogListener
+import com.dosparta.triviagame.screens.common.BaseActivity
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
-class TriviaGameActivity : AppCompatActivity(), ITriviaGameViewMvc.Listener {
+class TriviaGameActivity : BaseActivity(), ITriviaGameViewMvc.Listener {
 
     private val tag = TriviaGameActivity::class.java.simpleName
 
@@ -52,7 +51,7 @@ class TriviaGameActivity : AppCompatActivity(), ITriviaGameViewMvc.Listener {
         }, {
             onNetworkCallFailed(it)
         })
-        VolleySingleton.getInstance(this).addToRequestQueue(stringRequest)
+        getCompositionRoot().getVolleyInstance(this).addToRequestQueue(stringRequest)
     }
 
     private fun onQuestionsReceived(response: String) {

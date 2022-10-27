@@ -14,9 +14,8 @@ import com.dosparta.triviagame.questions.Question
 import com.dosparta.triviagame.screens.common.AlertDialogListener
 import com.dosparta.triviagame.screens.common.BaseObservableViewMvc
 import com.google.android.material.snackbar.Snackbar
-import com.dosparta.triviagame.screens.trivia.ITriviaGameViewMvc.Listener
 
-class TriviaGameViewMvc(inflater: LayoutInflater, parent: ViewGroup?) : BaseObservableViewMvc<Listener>(), OnCorrectAnswerListener,
+class TriviaGameViewMvc(inflater: LayoutInflater, parent: ViewGroup?) : BaseObservableViewMvc<ITriviaGameViewMvc.Listener>(), OnCorrectAnswerListener,
     ITriviaGameViewMvc {
 
     private var answersRecyclerAdapter: AnswersRecyclerAdapter? = null

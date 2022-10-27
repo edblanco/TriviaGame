@@ -6,9 +6,8 @@ import android.widget.Button
 import com.dosparta.triviagame.R
 import com.dosparta.triviagame.questions.Answer
 import com.dosparta.triviagame.screens.common.BaseObservableViewMvc
-import com.dosparta.triviagame.screens.trivia.IAnswersItemViewMvc.Listener
 
-class AnswersItemViewMvc(layoutInflater: LayoutInflater, parent: ViewGroup) : BaseObservableViewMvc<Listener>(), IAnswersItemViewMvc {
+class AnswersItemViewMvc(layoutInflater: LayoutInflater, parent: ViewGroup) : BaseObservableViewMvc<IAnswersItemViewMvc.Listener>(), IAnswersItemViewMvc {
 
     private val questionButton: Button
 

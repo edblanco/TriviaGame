@@ -10,7 +10,7 @@ class AnswersRecyclerAdapter(private val answers: List<Answer>, private val list
     RecyclerView.Adapter<AnswersRecyclerAdapter.ViewHolder>(), IAnswersItemViewMvc.Listener {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val answersItemViewMvc = AnswersItemViewMvc(LayoutInflater.from(parent.context), parent)
+        val answersItemViewMvc: IAnswersItemViewMvc = AnswersItemViewMvc(LayoutInflater.from(parent.context), parent)
         answersItemViewMvc.registerListener(this)
 
         return ViewHolder(answersItemViewMvc)

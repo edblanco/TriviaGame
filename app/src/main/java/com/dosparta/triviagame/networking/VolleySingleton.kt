@@ -9,16 +9,6 @@ import com.android.volley.toolbox.ImageLoader
 import com.android.volley.toolbox.Volley
 
 class VolleySingleton constructor(context: Context) {
-    companion object {
-        @Volatile
-        private var INSTANCE: VolleySingleton? = null
-        fun getInstance(context: Context) =
-            INSTANCE ?: synchronized(this) {
-                INSTANCE ?: VolleySingleton(context).also {
-                    INSTANCE = it
-                }
-            }
-    }
     val imageLoader: ImageLoader by lazy {
         ImageLoader(requestQueue,
             object : ImageLoader.ImageCache {
