@@ -10,6 +10,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.dosparta.triviagame.R
+import com.dosparta.triviagame.questions.Answer
 import com.dosparta.triviagame.questions.Question
 import com.dosparta.triviagame.screens.common.AlertDialogListener
 import com.dosparta.triviagame.screens.common.BaseObservableViewMvc
@@ -51,12 +52,13 @@ class TriviaGameViewMvc(
 
     override fun bindQuestions(currentQuestion: Int, questions: List<Question>) {
         questionTitleTv?.text = getContext().getString(R.string.out_of_text_placeholders, currentQuestion + 1, questions.size)
-        questionTv?.text = questions[currentQuestion].question
-        initAdapter(currentQuestion, questions)
+        val question = questions[currentQuestion]
+        questionTv?.text = question.question
+        initAdapter(question.answers)
     }
 
-    private fun initAdapter(questionPos: Int, questions: List<Question>) {
-        answersRecyclerAdapter = AnswersRecyclerAdapter(questions[questionPos].answers, this, viewMvcFactory)
+    private fun initAdapter(answers: List<Answer>) {
+        answersRecyclerAdapter = AnswersRecyclerAdapter(answers, this, viewMvcFactory)
         answersRecyclerView?.adapter = answersRecyclerAdapter
     }
 
