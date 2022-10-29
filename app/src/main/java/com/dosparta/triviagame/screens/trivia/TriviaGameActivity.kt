@@ -34,7 +34,7 @@ class TriviaGameActivity : BaseActivity(), ITriviaGameViewMvc.Listener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        _viewMvc = TriviaGameViewMvc(LayoutInflater.from(this), null)
+        _viewMvc = getCompositionRoot().getViewMvcFactory().getTriviaGameViewMvc(null)
         setContentView(viewMvc.getRootView())
         viewMvc.registerListener(this)
     }
