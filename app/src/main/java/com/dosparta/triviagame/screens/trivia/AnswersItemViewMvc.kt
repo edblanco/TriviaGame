@@ -7,7 +7,7 @@ import com.dosparta.triviagame.R
 import com.dosparta.triviagame.questions.Answer
 import com.dosparta.triviagame.screens.common.BaseObservableViewMvc
 
-class AnswersItemViewMvc(layoutInflater: LayoutInflater, parent: ViewGroup) : BaseObservableViewMvc<IAnswersItemViewMvc.Listener>(), IAnswersItemViewMvc {
+class AnswersItemViewMvc(layoutInflater: LayoutInflater, parent: ViewGroup?) : BaseObservableViewMvc<IAnswersItemViewMvc.Listener>(), IAnswersItemViewMvc {
 
     private val questionButton: Button
 

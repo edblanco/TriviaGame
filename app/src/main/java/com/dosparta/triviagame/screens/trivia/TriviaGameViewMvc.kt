@@ -13,9 +13,14 @@ import com.dosparta.triviagame.R
 import com.dosparta.triviagame.questions.Question
 import com.dosparta.triviagame.screens.common.AlertDialogListener
 import com.dosparta.triviagame.screens.common.BaseObservableViewMvc
+import com.dosparta.triviagame.screens.common.ViewMvcFactory
 import com.google.android.material.snackbar.Snackbar
 
-class TriviaGameViewMvc(inflater: LayoutInflater, parent: ViewGroup?) : BaseObservableViewMvc<ITriviaGameViewMvc.Listener>(), OnCorrectAnswerListener,
+class TriviaGameViewMvc(
+    inflater: LayoutInflater,
+    parent: ViewGroup?,
+    private val viewMvcFactory: ViewMvcFactory
+) : BaseObservableViewMvc<ITriviaGameViewMvc.Listener>(), OnCorrectAnswerListener,
     ITriviaGameViewMvc {
 
     private var answersRecyclerAdapter: AnswersRecyclerAdapter? = null
@@ -51,7 +56,7 @@ class TriviaGameViewMvc(inflater: LayoutInflater, parent: ViewGroup?) : BaseObse
     }
 
     private fun initAdapter(questionPos: Int, questions: List<Question>) {
-        answersRecyclerAdapter = AnswersRecyclerAdapter(questions[questionPos].answers, this)
+        answersRecyclerAdapter = AnswersRecyclerAdapter(questions[questionPos].answers, this, viewMvcFactory)
         answersRecyclerView?.adapter = answersRecyclerAdapter
     }
 

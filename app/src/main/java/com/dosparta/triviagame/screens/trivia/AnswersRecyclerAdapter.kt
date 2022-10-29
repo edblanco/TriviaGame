@@ -1,15 +1,19 @@
 package com.dosparta.triviagame.screens.trivia
 
-import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.dosparta.triviagame.questions.Answer
+import com.dosparta.triviagame.screens.common.ViewMvcFactory
 
-class AnswersRecyclerAdapter(private val answers: List<Answer>, private val listener: OnCorrectAnswerListener) :
+class AnswersRecyclerAdapter(
+    private val answers: List<Answer>,
+    private val listener: OnCorrectAnswerListener,
+    private val viewMvcFactory: ViewMvcFactory
+) :
     RecyclerView.Adapter<AnswersRecyclerAdapter.ViewHolder>(), IAnswersItemViewMvc.Listener {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val answersItemViewMvc: IAnswersItemViewMvc = AnswersItemViewMvc(LayoutInflater.from(parent.context), parent)
+        val answersItemViewMvc: IAnswersItemViewMvc = viewMvcFactory.getAnswersItemViewMvc(parent)
         answersItemViewMvc.registerListener(this)
 
         return ViewHolder(answersItemViewMvc)
