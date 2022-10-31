@@ -9,7 +9,7 @@ import com.dosparta.triviagame.screens.common.ViewMvcFactory
 
 class ControllerCompositionRoot(private val compositionRoot: CompositionRoot, private val activity: Activity) {
 
-    fun getVolleyInstance(context: Context): VolleySingleton {
+    private fun getVolleyInstance(context: Context): VolleySingleton {
         return compositionRoot.getVolleyInstance(context)
     }
 
