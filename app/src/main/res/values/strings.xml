@@ -1,13 +1,13 @@
 <resources>
     <string name="app_name">TriviaGame</string>
     <string name="title_text">Trivia</string>
-    <string name="out_of_text">Question: 45/89</string>
+    <string name="loading_question_out_of_questions">Question: loading…</string>
     <string name="true_button">True</string>
     <string name="false_button">False</string>
     <string name="next_button">Next</string>
     <string name="correct_answer" >Correct!</string>
     <string name="incorrect">Incorrect</string>
-    <string name="placeholder">This is a very long placeholder. Please always replace this text with the actual text to be used</string>
+    <string name="loading_question">loading…</string>
     <string name="out_of_text_placeholders">Question: %d/%d</string>
     <string name="network_error_popup_title">Network error! (%d)</string>
     <string name="network_error_popup_msg">A network error occurred.
