@@ -5,12 +5,16 @@ import android.content.Context
 import android.view.LayoutInflater
 import com.dosparta.triviagame.networking.VolleySingleton
 import com.dosparta.triviagame.questions.FetchTriviaQuestionsUseCase
+import com.dosparta.triviagame.screens.common.ActivityUtils
+import com.dosparta.triviagame.screens.common.MessagesDisplayer
+import com.dosparta.triviagame.screens.common.ScreensNavigator
 import com.dosparta.triviagame.screens.common.ViewMvcFactory
+import com.dosparta.triviagame.screens.trivia.TriviaGameController
 
 class ControllerCompositionRoot(private val compositionRoot: CompositionRoot, private val activity: Activity) {
 
-    private fun getVolleyInstance(context: Context): VolleySingleton {
-        return compositionRoot.getVolleyInstance(context)
+    private fun getVolleyInstance(): VolleySingleton {
+        return compositionRoot.getVolleyInstance(activity)
     }
 
     private fun getLayoutInflater(): LayoutInflater {
@@ -21,7 +25,24 @@ class ControllerCompositionRoot(private val compositionRoot: CompositionRoot, pr
         return ViewMvcFactory(getLayoutInflater())
     }
 
-    fun getFetchTriviaQuestionsUseCase(context: Context): FetchTriviaQuestionsUseCase {
-        return FetchTriviaQuestionsUseCase(getVolleyInstance(context))
+    private fun getFetchTriviaQuestionsUseCase(): FetchTriviaQuestionsUseCase {
+        return FetchTriviaQuestionsUseCase(getVolleyInstance())
+    }
+
+    fun getTriviaGameController(): TriviaGameController {
+        // todo: move screen navigator and MessagesDisplayer to ActivityUtils
+        return TriviaGameController(getFetchTriviaQuestionsUseCase(), getScreensNavigator(), getMessagesDisplayer(), getActivityUtils())
+    }
+
+    private fun getScreensNavigator(): ScreensNavigator {
+        return ScreensNavigator(activity)
+    }
+
+    private fun getMessagesDisplayer(): MessagesDisplayer {
+        return MessagesDisplayer(activity)
+    }
+
+    private fun getActivityUtils(): ActivityUtils {
+        return ActivityUtils(activity)
     }
 }

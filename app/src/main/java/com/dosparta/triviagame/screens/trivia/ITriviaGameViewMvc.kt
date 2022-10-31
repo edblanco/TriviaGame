@@ -10,6 +10,6 @@ interface ITriviaGameViewMvc: ObservableViewMvc<ITriviaGameViewMvc.Listener> {
     }
     fun setLoadingState(loading: Boolean)
     fun bindQuestions(currentQuestion: Int, questions: List<Question>)
-    fun showResults(correctAnswers: Int, totalAnswers: Int, answerListener: AlertDialogListener)
-    fun showErrorDialog(statusCode: Int, answerListener: AlertDialogListener)
+    fun showResults(correctAnswers: Int, totalAnswers: Int, answerListener: AlertDialogListener) //todo move to message displayer
+    fun showErrorDialog(statusCode: Int, answerListener: AlertDialogListener) //todo move to message displayer
 }
