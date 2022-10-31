@@ -13,6 +13,7 @@ import com.dosparta.triviagame.R
 import com.dosparta.triviagame.common.Utils
 import com.dosparta.triviagame.networking.schemas.QuestionsSchema
 import com.dosparta.triviagame.questions.Answer
+import com.dosparta.triviagame.questions.FetchTriviaQuestionsUseCase
 import com.dosparta.triviagame.questions.Question
 import com.dosparta.triviagame.screens.common.AlertDialogListener
 import com.dosparta.triviagame.screens.common.BaseActivity
@@ -20,13 +21,17 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
-class TriviaGameActivity : BaseActivity(), ITriviaGameViewMvc.Listener {
+class TriviaGameActivity : BaseActivity(), ITriviaGameViewMvc.Listener,
+    FetchTriviaQuestionsUseCase.Listener {
 
     private val tag = TriviaGameActivity::class.java.simpleName
 
-    private val questions: MutableList<Question> = mutableListOf()
+    private var questions: List<Question> = listOf()
     private var currentQuestion: Int = 0
     private var correctAnswers: Int = 0
+
+    private var _fetchTriviaQuestionsUseCase: FetchTriviaQuestionsUseCase? = null
+    private val fetchTriviaQuestionsUseCase get() = _fetchTriviaQuestionsUseCase!!
 
     private var _viewMvc: ITriviaGameViewMvc? = null
     private val viewMvc get() = _viewMvc!!
@@ -35,35 +40,33 @@ class TriviaGameActivity : BaseActivity(), ITriviaGameViewMvc.Listener {
         super.onCreate(savedInstanceState)
 
         _viewMvc = getCompositionRoot().getViewMvcFactory().getTriviaGameViewMvc(null)
+        _fetchTriviaQuestionsUseCase = getCompositionRoot().getFetchTriviaQuestionsUseCase(this)
+
         setContentView(viewMvc.getRootView())
-        viewMvc.registerListener(this)
     }
 
     override fun onStart() {
         super.onStart()
-        loadQuestions()
+        viewMvc.registerListener(this)
+        fetchTriviaQuestionsUseCase.registerListener(this)
+        fetchTriviaQuestionsUseCase.fetchTriviaQuestionsAndNotify()
     }
 
-    private fun loadQuestions() {
-        viewMvc.setLoadingState(true)
-        val stringRequest = StringRequest(Request.Method.GET, Utils.TRIVIA_API_URL, { response ->
-            onQuestionsReceived(response)
-        }, {
-            onNetworkCallFailed(it)
-        })
-        getCompositionRoot().getVolleyInstance(this).addToRequestQueue(stringRequest)
+    override fun onStop() {
+        super.onStop()
+        viewMvc.unregisterListener(this)
+        fetchTriviaQuestionsUseCase.unregisterListener(this)
     }
 
-    private fun onQuestionsReceived(response: String) {
-        Log.i(tag, "Response (first 500 chars): ${response.substring(0, 500)}")
-        fillQuestionList(response)
+    override fun onTriviaQuestionsFetched(questions: List<Question>) {
+        this.questions = questions
         viewMvc.bindQuestions(currentQuestion, questions)
         viewMvc.setLoadingState(false)
     }
 
-    private fun onNetworkCallFailed(it: VolleyError) {
-        Log.i(tag, "Unable to retrieve data: ${it.networkResponse}")
-        showErrorDialog(if (it.networkResponse != null) it.networkResponse.statusCode else Utils.INTERNAL_SERVER_ERROR)
+    override fun onTriviaQuestionsFetchFailed(error: VolleyError?) {
+        Log.i(tag, "Unable to retrieve data: ${error?.networkResponse}")
+        showErrorDialog(if (error?.networkResponse != null) error.networkResponse.statusCode else Utils.INTERNAL_SERVER_ERROR)
     }
 
     private fun showErrorDialog(statusCode: Int) {
@@ -79,35 +82,6 @@ class TriviaGameActivity : BaseActivity(), ITriviaGameViewMvc.Listener {
             }
         }
         viewMvc.showErrorDialog(statusCode, answerListener)
-    }
-
-    private fun fillQuestionList(response: String) {
-        val jsonData = Json.decodeFromString<QuestionsSchema>(response)
-        questions.addAll(questionsSchemaToQuestions(jsonData))
-        Log.i(tag, "onStart: $jsonData")
-    }
-
-    private fun questionsSchemaToQuestions(questionsSchema: QuestionsSchema) : List<Question>
-    {
-        val questionList :MutableList<Question> = mutableListOf()
-        for (result in questionsSchema.results) {
-            val answers :MutableList<Answer> = mutableListOf(Answer(Html.fromHtml(result.correct_answer, Html.FROM_HTML_MODE_COMPACT).toString(), true))
-            for (incorrectAnswer in result.incorrect_answers){
-                answers.add(Answer(Html.fromHtml(incorrectAnswer, Html.FROM_HTML_MODE_COMPACT).toString(), false))
-            }
-
-            val question = Question(
-                question = Html.fromHtml(result.question, Html.FROM_HTML_MODE_COMPACT).toString(),
-                difficulty = result.difficulty,
-                category = result.category,
-                type = result.type,
-                answers = answers.shuffled()
-            )
-
-            questionList.add(question)
-        }
-        Log.i(tag, "list of question $questionList")
-        return questionList
     }
 
     private fun moveToNextQuestionWithDelay() {
@@ -153,11 +127,6 @@ class TriviaGameActivity : BaseActivity(), ITriviaGameViewMvc.Listener {
             ++correctAnswers
         }
         moveToNextQuestionWithDelay()
-    }
-
-    override fun onDestroy() {
-        viewMvc.unregisterListener(this)
-        super.onDestroy()
     }
 
     companion object {

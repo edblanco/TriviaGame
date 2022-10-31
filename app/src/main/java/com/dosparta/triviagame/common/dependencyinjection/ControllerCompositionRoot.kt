@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.view.LayoutInflater
 import com.dosparta.triviagame.networking.VolleySingleton
+import com.dosparta.triviagame.questions.FetchTriviaQuestionsUseCase
 import com.dosparta.triviagame.screens.common.ViewMvcFactory
 
 class ControllerCompositionRoot(private val compositionRoot: CompositionRoot, private val activity: Activity) {
@@ -18,5 +19,9 @@ class ControllerCompositionRoot(private val compositionRoot: CompositionRoot, pr
 
     fun getViewMvcFactory(): ViewMvcFactory {
         return ViewMvcFactory(getLayoutInflater())
+    }
+
+    fun getFetchTriviaQuestionsUseCase(context: Context): FetchTriviaQuestionsUseCase {
+        return FetchTriviaQuestionsUseCase(getVolleyInstance(context))
     }
 }
