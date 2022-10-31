@@ -1,4 +1,4 @@
-package com.dosparta.triviagame.screens.trivia
+package com.dosparta.triviagame.screens.trivia.answersitem
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView

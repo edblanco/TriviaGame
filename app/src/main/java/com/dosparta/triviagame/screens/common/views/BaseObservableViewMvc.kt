@@ -1,8 +1,9 @@
-package com.dosparta.triviagame.screens.common
+package com.dosparta.triviagame.screens.common.views
 
 import java.util.*
 
-abstract class BaseObservableViewMvc<ListenerType> : BaseViewMvc(), ObservableViewMvc<ListenerType> {
+abstract class BaseObservableViewMvc<ListenerType> : BaseViewMvc(),
+    ObservableViewMvc<ListenerType> {
     private val listeners: MutableSet<ListenerType> = mutableSetOf()
 
     override fun registerListener(listener: ListenerType) {

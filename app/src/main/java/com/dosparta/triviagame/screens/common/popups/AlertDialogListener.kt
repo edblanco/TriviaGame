@@ -1,4 +1,4 @@
-package com.dosparta.triviagame.screens.common
+package com.dosparta.triviagame.screens.common.popups
 
 interface AlertDialogListener {
     fun onPositiveAnswer()

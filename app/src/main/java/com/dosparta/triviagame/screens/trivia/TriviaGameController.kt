@@ -1,19 +1,18 @@
 package com.dosparta.triviagame.screens.trivia
 
-import android.os.Handler
 import android.util.Log
 import com.android.volley.VolleyError
 import com.dosparta.triviagame.common.Utils
 import com.dosparta.triviagame.questions.FetchTriviaQuestionsUseCase
 import com.dosparta.triviagame.questions.Question
 import com.dosparta.triviagame.screens.common.ActivityUtils
-import com.dosparta.triviagame.screens.common.AlertDialogListener
-import com.dosparta.triviagame.screens.common.MessagesDisplayer
-import com.dosparta.triviagame.screens.common.ScreensNavigator
+import com.dosparta.triviagame.screens.common.popups.AlertDialogListener
+import com.dosparta.triviagame.screens.common.popups.OverlayMessagesHelper
+import com.dosparta.triviagame.screens.common.screensnavigator.ScreensNavigator
 
 class TriviaGameController(private val fetchTriviaQuestionsUseCase: FetchTriviaQuestionsUseCase
 , private val screensNavigator: ScreensNavigator
-, private val messagesDisplayer: MessagesDisplayer
+, private val overlayMessagesHelper: OverlayMessagesHelper
 , private val activityUtils: ActivityUtils)
     : ITriviaGameViewMvc.Listener, FetchTriviaQuestionsUseCase.Listener {
 
@@ -76,7 +75,7 @@ class TriviaGameController(private val fetchTriviaQuestionsUseCase: FetchTriviaQ
 
     private fun moveToNextQuestion(){
         if (currentQuestion == (questions.size - 1)){
-            messagesDisplayer.showGameOverOverlay(correctAnswers, questions.size)
+            overlayMessagesHelper.showGameOverOverlay(correctAnswers, questions.size)
             showResults()
             return
         }

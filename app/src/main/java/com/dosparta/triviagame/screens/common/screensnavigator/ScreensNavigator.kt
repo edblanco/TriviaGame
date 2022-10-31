@@ -1,4 +1,4 @@
-package com.dosparta.triviagame.screens.common
+package com.dosparta.triviagame.screens.common.screensnavigator
 
 import android.app.Activity
 import android.content.Context

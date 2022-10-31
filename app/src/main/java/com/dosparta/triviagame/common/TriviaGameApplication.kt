@@ -1,4 +1,4 @@
-package com.dosparta.triviagame
+package com.dosparta.triviagame.common
 
 import android.app.Application
 import com.dosparta.triviagame.common.dependencyinjection.CompositionRoot

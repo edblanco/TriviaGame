@@ -1,13 +1,12 @@
 package com.dosparta.triviagame.common.dependencyinjection
 
 import android.app.Activity
-import android.content.Context
 import android.view.LayoutInflater
 import com.dosparta.triviagame.networking.VolleySingleton
 import com.dosparta.triviagame.questions.FetchTriviaQuestionsUseCase
 import com.dosparta.triviagame.screens.common.ActivityUtils
-import com.dosparta.triviagame.screens.common.MessagesDisplayer
-import com.dosparta.triviagame.screens.common.ScreensNavigator
+import com.dosparta.triviagame.screens.common.popups.OverlayMessagesHelper
+import com.dosparta.triviagame.screens.common.screensnavigator.ScreensNavigator
 import com.dosparta.triviagame.screens.common.ViewMvcFactory
 import com.dosparta.triviagame.screens.trivia.TriviaGameController
 
@@ -38,8 +37,8 @@ class ControllerCompositionRoot(private val compositionRoot: CompositionRoot, pr
         return ScreensNavigator(activity)
     }
 
-    private fun getMessagesDisplayer(): MessagesDisplayer {
-        return MessagesDisplayer(activity)
+    private fun getMessagesDisplayer(): OverlayMessagesHelper {
+        return OverlayMessagesHelper(activity)
     }
 
     private fun getActivityUtils(): ActivityUtils {

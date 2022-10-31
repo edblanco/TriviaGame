@@ -1,8 +1,8 @@
 package com.dosparta.triviagame.screens.trivia
 
 import com.dosparta.triviagame.questions.Question
-import com.dosparta.triviagame.screens.common.AlertDialogListener
-import com.dosparta.triviagame.screens.common.ObservableViewMvc
+import com.dosparta.triviagame.screens.common.popups.AlertDialogListener
+import com.dosparta.triviagame.screens.common.views.ObservableViewMvc
 
 interface ITriviaGameViewMvc: ObservableViewMvc<ITriviaGameViewMvc.Listener> {
     interface Listener{

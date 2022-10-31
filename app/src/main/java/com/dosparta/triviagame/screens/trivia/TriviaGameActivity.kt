@@ -3,10 +3,7 @@ package com.dosparta.triviagame.screens.trivia
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import com.dosparta.triviagame.TriviaGameApplication
-import com.dosparta.triviagame.questions.FetchTriviaQuestionsUseCase
-import com.dosparta.triviagame.questions.Question
-import com.dosparta.triviagame.screens.common.BaseActivity
+import com.dosparta.triviagame.screens.common.controllers.BaseActivity
 
 class TriviaGameActivity : BaseActivity() {
 

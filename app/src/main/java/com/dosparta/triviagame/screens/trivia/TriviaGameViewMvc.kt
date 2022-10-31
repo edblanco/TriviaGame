@@ -12,9 +12,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dosparta.triviagame.R
 import com.dosparta.triviagame.questions.Answer
 import com.dosparta.triviagame.questions.Question
-import com.dosparta.triviagame.screens.common.AlertDialogListener
-import com.dosparta.triviagame.screens.common.BaseObservableViewMvc
+import com.dosparta.triviagame.screens.common.popups.AlertDialogListener
+import com.dosparta.triviagame.screens.common.views.BaseObservableViewMvc
 import com.dosparta.triviagame.screens.common.ViewMvcFactory
+import com.dosparta.triviagame.screens.trivia.answersitem.AnswersRecyclerAdapter
+import com.dosparta.triviagame.screens.trivia.answersitem.OnCorrectAnswerListener
 import com.google.android.material.snackbar.Snackbar
 
 class TriviaGameViewMvc(

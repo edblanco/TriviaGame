@@ -2,8 +2,8 @@ package com.dosparta.triviagame.screens.common
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.dosparta.triviagame.screens.trivia.AnswersItemViewMvc
-import com.dosparta.triviagame.screens.trivia.IAnswersItemViewMvc
+import com.dosparta.triviagame.screens.trivia.answersitem.AnswersItemViewMvc
+import com.dosparta.triviagame.screens.trivia.answersitem.IAnswersItemViewMvc
 import com.dosparta.triviagame.screens.trivia.ITriviaGameViewMvc
 import com.dosparta.triviagame.screens.trivia.TriviaGameViewMvc
 

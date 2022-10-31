@@ -1,4 +1,4 @@
-package com.dosparta.triviagame.screens.common
+package com.dosparta.triviagame.screens.common.views
 
 import android.content.Context
 import android.view.View
