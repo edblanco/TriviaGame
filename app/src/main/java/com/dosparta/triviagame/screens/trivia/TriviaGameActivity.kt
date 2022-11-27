@@ -32,6 +32,11 @@ class TriviaGameActivity : BaseActivity() {
         triviaGameController.onSaveInstanceState(outState)
     }
 
+    override fun onResume() {
+        super.onResume()
+        triviaGameController.onResume()
+    }
+
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
         triviaGameController.onRestoreInstanceState(savedInstanceState)
