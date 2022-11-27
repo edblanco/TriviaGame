@@ -1,5 +1,6 @@
 package com.dosparta.triviagame.screens.trivia
 
+import android.os.Bundle
 import android.util.Log
 import com.android.volley.VolleyError
 import com.dosparta.triviagame.common.Utils
@@ -107,8 +108,23 @@ class TriviaGameController(private val fetchTriviaQuestionsUseCase: FetchTriviaQ
         _viewMvc = viewMvc
     }
 
+    fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt(CURRENT_QUESTION, currentQuestion)
+        outState.putInt(CORRECT_ANSWERS, correctAnswers)
+        outState.putParcelableArrayList(QUESTIONS, ArrayList(questions))
+    }
+
+    fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        currentQuestion = savedInstanceState.getInt(CURRENT_QUESTION)
+        correctAnswers = savedInstanceState.getInt(CORRECT_ANSWERS)
+        questions = savedInstanceState.getParcelableArrayList<Question>(QUESTIONS)?.toList() ?: questions
+    }
+
     companion object {
         private val tag = TriviaGameActivity::class.java.simpleName
         private const val JUMP_TO_NEXT_QUESTION_DELAY = 3000L
+        private const val CURRENT_QUESTION = "CURRENT_QUESTION"
+        private const val CORRECT_ANSWERS = "CORRECT_ANSWERS"
+        private const val QUESTIONS = "QUESTIONS"
     }
 }

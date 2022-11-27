@@ -3,6 +3,7 @@ package com.dosparta.triviagame.screens.trivia
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.PersistableBundle
 import com.dosparta.triviagame.screens.common.controllers.BaseActivity
 
 class TriviaGameActivity : BaseActivity() {
@@ -24,6 +25,16 @@ class TriviaGameActivity : BaseActivity() {
     override fun onStart() {
         super.onStart()
         triviaGameController.onStart()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        triviaGameController.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+        triviaGameController.onRestoreInstanceState(savedInstanceState)
     }
 
     override fun onStop() {
