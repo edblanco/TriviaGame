@@ -81,7 +81,6 @@ class TriviaGameController(
             }
 
             override fun onNegativeAnswer() {
-                resetGame()
                 screensNavigator.closeApp()
             }
         }
