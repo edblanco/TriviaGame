@@ -11,15 +11,17 @@ import com.dosparta.triviagame.screens.common.popups.AlertDialogListener
 import com.dosparta.triviagame.screens.common.popups.OverlayMessagesHelper
 import com.dosparta.triviagame.screens.common.screensnavigator.ScreensNavigator
 
-class TriviaGameController(private val fetchTriviaQuestionsUseCase: FetchTriviaQuestionsUseCase
-, private val screensNavigator: ScreensNavigator
-, private val overlayMessagesHelper: OverlayMessagesHelper
-, private val activityUtils: ActivityUtils)
-    : ITriviaGameViewMvc.Listener, FetchTriviaQuestionsUseCase.Listener {
+class TriviaGameController(
+    private val fetchTriviaQuestionsUseCase: FetchTriviaQuestionsUseCase,
+    private val screensNavigator: ScreensNavigator,
+    private val overlayMessagesHelper: OverlayMessagesHelper,
+    private val activityUtils: ActivityUtils
+) : ITriviaGameViewMvc.Listener, FetchTriviaQuestionsUseCase.Listener {
 
     private var questions: List<Question> = listOf()
     private var currentQuestion: Int = 0
     private var correctAnswers: Int = 0
+    private var isGameOver = false
 
     private var _viewMvc: ITriviaGameViewMvc? = null
     private val viewMvc get() = _viewMvc!!
@@ -27,7 +29,29 @@ class TriviaGameController(private val fetchTriviaQuestionsUseCase: FetchTriviaQ
     fun onStart() {
         viewMvc.registerListener(this)
         fetchTriviaQuestionsUseCase.registerListener(this)
-        fetchTriviaQuestionsUseCase.fetchTriviaQuestionsAndNotify()
+    }
+
+    fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        currentQuestion = savedInstanceState.getInt(CURRENT_QUESTION)
+        correctAnswers = savedInstanceState.getInt(CORRECT_ANSWERS)
+        isGameOver = savedInstanceState.getBoolean(GAME_OVER)
+        questions =
+            savedInstanceState.getParcelableArrayList<Question>(QUESTIONS)?.toList() ?: questions
+    }
+
+    fun onResume() {
+        if (questions.isEmpty()) {
+            fetchTriviaQuestionsUseCase.fetchTriviaQuestionsAndNotify()
+        } else {
+            onTriviaQuestionsFetched(questions)
+        }
+    }
+
+    fun onSaveInstanceState(outState: Bundle) {
+        outState.putInt(CURRENT_QUESTION, currentQuestion)
+        outState.putInt(CORRECT_ANSWERS, correctAnswers)
+        outState.putBoolean(GAME_OVER, isGameOver)
+        outState.putParcelableArrayList(QUESTIONS, ArrayList(questions))
     }
 
     fun onStop() {
@@ -39,6 +63,9 @@ class TriviaGameController(private val fetchTriviaQuestionsUseCase: FetchTriviaQ
         this.questions = questions
         viewMvc.bindQuestions(currentQuestion, questions)
         viewMvc.setLoadingState(false)
+        if (isGameOver) {
+            showResults()
+        }
     }
 
     override fun onTriviaQuestionsFetchFailed(error: VolleyError?) {
@@ -47,14 +74,13 @@ class TriviaGameController(private val fetchTriviaQuestionsUseCase: FetchTriviaQ
     }
 
     private fun showErrorDialog(statusCode: Int) {
-        val answerListener = object: AlertDialogListener {
+        val answerListener = object : AlertDialogListener {
             override fun onPositiveAnswer() {
                 screensNavigator.toTriviaGame()
                 screensNavigator.closeScreen()
             }
 
             override fun onNegativeAnswer() {
-                resetGame()
                 screensNavigator.closeApp()
             }
         }
@@ -62,7 +88,7 @@ class TriviaGameController(private val fetchTriviaQuestionsUseCase: FetchTriviaQ
     }
 
     override fun onAnswerClicked(isCorrect: Boolean) {
-        if (isCorrect){
+        if (isCorrect) {
             ++correctAnswers
         }
         moveToNextQuestionWithDelay()
@@ -74,9 +100,10 @@ class TriviaGameController(private val fetchTriviaQuestionsUseCase: FetchTriviaQ
         }, JUMP_TO_NEXT_QUESTION_DELAY)
     }
 
-    private fun moveToNextQuestion(){
-        if (currentQuestion == (questions.size - 1)){
+    private fun moveToNextQuestion() {
+        if (currentQuestion == (questions.size - 1)) {
             overlayMessagesHelper.showGameOverOverlay(correctAnswers, questions.size)
+            isGameOver = true
             showResults()
             return
         }
@@ -85,7 +112,7 @@ class TriviaGameController(private val fetchTriviaQuestionsUseCase: FetchTriviaQ
     }
 
     private fun showResults() {
-        val answerListener = object: AlertDialogListener {
+        val answerListener = object : AlertDialogListener {
             override fun onPositiveAnswer() {
                 screensNavigator.toTriviaGame()
                 screensNavigator.closeScreen()
@@ -101,23 +128,12 @@ class TriviaGameController(private val fetchTriviaQuestionsUseCase: FetchTriviaQ
     private fun resetGame() {
         correctAnswers = 0
         currentQuestion = 0
+        isGameOver = false
         viewMvc.bindQuestions(currentQuestion, questions)
     }
 
     fun bindView(viewMvc: ITriviaGameViewMvc) {
         _viewMvc = viewMvc
-    }
-
-    fun onSaveInstanceState(outState: Bundle) {
-        outState.putInt(CURRENT_QUESTION, currentQuestion)
-        outState.putInt(CORRECT_ANSWERS, correctAnswers)
-        outState.putParcelableArrayList(QUESTIONS, ArrayList(questions))
-    }
-
-    fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        currentQuestion = savedInstanceState.getInt(CURRENT_QUESTION)
-        correctAnswers = savedInstanceState.getInt(CORRECT_ANSWERS)
-        questions = savedInstanceState.getParcelableArrayList<Question>(QUESTIONS)?.toList() ?: questions
     }
 
     companion object {
@@ -126,5 +142,6 @@ class TriviaGameController(private val fetchTriviaQuestionsUseCase: FetchTriviaQ
         private const val CURRENT_QUESTION = "CURRENT_QUESTION"
         private const val CORRECT_ANSWERS = "CORRECT_ANSWERS"
         private const val QUESTIONS = "QUESTIONS"
+        private const val GAME_OVER = "GAME_OVER"
     }
 }

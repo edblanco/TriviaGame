@@ -9,4 +9,6 @@
     <dimen name="main_button_height">55dp</dimen>
     <dimen name="normal_text_size">18sp</dimen>
     <dimen name="title_text_size">30sp</dimen>
+    <dimen name="extra_large_margin">128dp</dimen>
+    <dimen name="small_margin">16dp</dimen>
 </resources>
