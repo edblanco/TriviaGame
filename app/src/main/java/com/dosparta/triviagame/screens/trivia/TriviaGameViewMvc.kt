@@ -3,6 +3,7 @@ package com.dosparta.triviagame.screens.trivia
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -26,42 +27,53 @@ class TriviaGameViewMvc(
 ) : BaseObservableViewMvc<ITriviaGameViewMvc.Listener>(), OnCorrectAnswerListener,
     ITriviaGameViewMvc {
 
-    private var answersRecyclerAdapter: AnswersRecyclerAdapter? = null
-    private var parentLayout: ConstraintLayout? = null
-    private var questionTitleTv: TextView? = null
-    private var questionTv: TextView? = null
-    private var loadingBar: ProgressBar? = null
-    private var answersRecyclerView: RecyclerView? = null
+    private lateinit var answersRecyclerAdapter: AnswersRecyclerAdapter
+    private lateinit var parentLayout: ConstraintLayout
+    private lateinit var questionTitleTv: TextView
+    private lateinit var questionTv: TextView
+    private lateinit var buttonNext: Button
+    private lateinit var loadingBar: ProgressBar
+    private lateinit var answersRecyclerView: RecyclerView
 
     init {
         setRootView(inflater.inflate(R.layout.activity_main, parent, false))
         attachUI()
+        registerClickListeners()
     }
 
     private fun attachUI() {
         parentLayout = findViewById(R.id.parent_layout)
         questionTitleTv = findViewById(R.id.text_view_out_of)
         questionTv = findViewById(R.id.question_textview)
+        buttonNext = findViewById(R.id.button_next)
         loadingBar = findViewById(R.id.loading_bar)
         answersRecyclerView = findViewById(R.id.answers_recycler_view)
-        answersRecyclerView?.layoutManager = LinearLayoutManager(getContext())
+        answersRecyclerView.layoutManager = LinearLayoutManager(getContext())
+    }
+
+    private fun registerClickListeners() {
+        buttonNext.setOnClickListener {
+            for (listener in getListeners()){
+                listener.onButtonNextClicked()
+            }
+        }
     }
 
     override fun setLoadingState(loading: Boolean) {
-        loadingBar?.visibility = if (loading) View.VISIBLE else View.GONE
-        parentLayout?.alpha = if (loading) ALPHA_FIFTY_PERCENT else ALPHA_HUNDRED_PERCENT
+        loadingBar.visibility = if (loading) View.VISIBLE else View.GONE
+        parentLayout.alpha = if (loading) ALPHA_FIFTY_PERCENT else ALPHA_HUNDRED_PERCENT
     }
 
     override fun bindQuestions(currentQuestion: Int, questions: List<Question>) {
-        questionTitleTv?.text = getContext().getString(R.string.out_of_text_placeholders, currentQuestion + 1, questions.size)
+        questionTitleTv.text = getContext().getString(R.string.out_of_text_placeholders, currentQuestion + 1, questions.size)
         val question = questions[currentQuestion]
-        questionTv?.text = question.question
+        questionTv.text = question.question
         initAdapter(question.answers)
     }
 
     private fun initAdapter(answers: List<Answer>) {
         answersRecyclerAdapter = AnswersRecyclerAdapter(answers, this, viewMvcFactory)
-        answersRecyclerView?.adapter = answersRecyclerAdapter
+        answersRecyclerView.adapter = answersRecyclerAdapter
     }
 
     override fun showResults(correctAnswers: Int, totalAnswers: Int, answerListener: AlertDialogListener) {
@@ -95,6 +107,10 @@ class TriviaGameViewMvc(
             }
             .setCancelable(false)
             .show()
+    }
+
+    override fun showButtonNext(show: Boolean) {
+        buttonNext.visibility = if (show) View.VISIBLE else View.GONE
     }
 
     override fun onCorrect(isCorrect: Boolean) {

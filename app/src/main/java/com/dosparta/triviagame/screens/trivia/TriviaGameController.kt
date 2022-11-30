@@ -16,7 +16,7 @@ class TriviaGameController(
     private val screensNavigator: ScreensNavigator,
     private val overlayMessagesHelper: OverlayMessagesHelper,
     private val activityUtils: ActivityUtils
-) : ITriviaGameViewMvc.Listener, FetchTriviaQuestionsUseCase.Listener {
+) : ITriviaGameController, ITriviaGameViewMvc.Listener, FetchTriviaQuestionsUseCase.Listener {
 
     private var questions: List<Question> = listOf()
     private var currentQuestion: Int = 0
@@ -26,12 +26,12 @@ class TriviaGameController(
     private var _viewMvc: ITriviaGameViewMvc? = null
     private val viewMvc get() = _viewMvc!!
 
-    fun onStart() {
+    override fun onStart() {
         viewMvc.registerListener(this)
         fetchTriviaQuestionsUseCase.registerListener(this)
     }
 
-    fun onRestoreInstanceState(savedInstanceState: Bundle) {
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         currentQuestion = savedInstanceState.getInt(CURRENT_QUESTION)
         correctAnswers = savedInstanceState.getInt(CORRECT_ANSWERS)
         isGameOver = savedInstanceState.getBoolean(GAME_OVER)
@@ -39,7 +39,7 @@ class TriviaGameController(
             savedInstanceState.getParcelableArrayList<Question>(QUESTIONS)?.toList() ?: questions
     }
 
-    fun onResume() {
+    override fun onResume() {
         if (questions.isEmpty()) {
             fetchTriviaQuestionsUseCase.fetchTriviaQuestionsAndNotify()
         } else {
@@ -47,14 +47,14 @@ class TriviaGameController(
         }
     }
 
-    fun onSaveInstanceState(outState: Bundle) {
+    override fun onSaveInstanceState(outState: Bundle) {
         outState.putInt(CURRENT_QUESTION, currentQuestion)
         outState.putInt(CORRECT_ANSWERS, correctAnswers)
         outState.putBoolean(GAME_OVER, isGameOver)
         outState.putParcelableArrayList(QUESTIONS, ArrayList(questions))
     }
 
-    fun onStop() {
+    override fun onStop() {
         viewMvc.unregisterListener(this)
         fetchTriviaQuestionsUseCase.unregisterListener(this)
     }
@@ -71,6 +71,10 @@ class TriviaGameController(
     override fun onTriviaQuestionsFetchFailed(error: VolleyError?) {
         Log.i(tag, "Unable to retrieve data: ${error?.networkResponse}")
         showErrorDialog(if (error?.networkResponse != null) error.networkResponse.statusCode else Utils.INTERNAL_SERVER_ERROR)
+    }
+
+    override fun bindView(viewMvc: ITriviaGameViewMvc) {
+        _viewMvc = viewMvc
     }
 
     private fun showErrorDialog(statusCode: Int) {
@@ -91,6 +95,7 @@ class TriviaGameController(
         if (isCorrect) {
             ++correctAnswers
         }
+        viewMvc.showButtonNext(true)
         moveToNextQuestionWithDelay()
     }
 
@@ -98,6 +103,11 @@ class TriviaGameController(
         activityUtils.postDelayed({
             moveToNextQuestion()
         }, JUMP_TO_NEXT_QUESTION_DELAY)
+    }
+
+    override fun onButtonNextClicked() {
+        activityUtils.removeCallbacksAndMessages(null)
+        moveToNextQuestion()
     }
 
     private fun moveToNextQuestion() {
@@ -108,6 +118,7 @@ class TriviaGameController(
             return
         }
         ++currentQuestion
+        viewMvc.showButtonNext(false)
         viewMvc.bindQuestions(currentQuestion, questions)
     }
 
@@ -130,10 +141,6 @@ class TriviaGameController(
         currentQuestion = 0
         isGameOver = false
         viewMvc.bindQuestions(currentQuestion, questions)
-    }
-
-    fun bindView(viewMvc: ITriviaGameViewMvc) {
-        _viewMvc = viewMvc
     }
 
     companion object {
