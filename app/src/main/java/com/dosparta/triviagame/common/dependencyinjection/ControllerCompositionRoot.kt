@@ -8,6 +8,7 @@ import com.dosparta.triviagame.screens.common.ActivityUtils
 import com.dosparta.triviagame.screens.common.popups.OverlayMessagesHelper
 import com.dosparta.triviagame.screens.common.screensnavigator.ScreensNavigator
 import com.dosparta.triviagame.screens.common.ViewMvcFactory
+import com.dosparta.triviagame.screens.trivia.ITriviaGameController
 import com.dosparta.triviagame.screens.trivia.TriviaGameController
 
 class ControllerCompositionRoot(private val compositionRoot: CompositionRoot, private val activity: Activity) {
@@ -28,7 +29,7 @@ class ControllerCompositionRoot(private val compositionRoot: CompositionRoot, pr
         return FetchTriviaQuestionsUseCase(getVolleyInstance())
     }
 
-    fun getTriviaGameController(): TriviaGameController {
+    fun getTriviaGameController(): ITriviaGameController {
         // todo: move screen navigator and MessagesDisplayer to ActivityUtils
         return TriviaGameController(getFetchTriviaQuestionsUseCase(), getScreensNavigator(), getMessagesDisplayer(), getActivityUtils())
     }

@@ -3,18 +3,18 @@ package com.dosparta.triviagame.screens.trivia
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
 import com.dosparta.triviagame.screens.common.controllers.BaseActivity
 
 class TriviaGameActivity : BaseActivity() {
 
-    private var _triviaGameController: TriviaGameController? = null
+    private var _triviaGameController: ITriviaGameController? = null
     private val triviaGameController get() = _triviaGameController!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val viewMvc: ITriviaGameViewMvc = getCompositionRoot().getViewMvcFactory().getTriviaGameViewMvc(null)
+        val viewMvc: ITriviaGameViewMvc =
+            getCompositionRoot().getViewMvcFactory().getTriviaGameViewMvc(null)
         _triviaGameController = getCompositionRoot().getTriviaGameController()
 
         triviaGameController.bindView(viewMvc)
