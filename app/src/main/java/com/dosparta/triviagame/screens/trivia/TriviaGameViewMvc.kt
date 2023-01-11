@@ -13,12 +13,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.dosparta.triviagame.R
 import com.dosparta.triviagame.questions.Answer
 import com.dosparta.triviagame.questions.Question
+import com.dosparta.triviagame.screens.common.ViewMvcFactory
 import com.dosparta.triviagame.screens.common.popups.AlertDialogListener
 import com.dosparta.triviagame.screens.common.views.BaseObservableViewMvc
-import com.dosparta.triviagame.screens.common.ViewMvcFactory
 import com.dosparta.triviagame.screens.trivia.answersitem.AnswersRecyclerAdapter
+import com.dosparta.triviagame.screens.trivia.answersitem.IAnswersItemViewMvc
 import com.dosparta.triviagame.screens.trivia.answersitem.OnCorrectAnswerListener
-import com.google.android.material.snackbar.Snackbar
 
 class TriviaGameViewMvc(
     inflater: LayoutInflater,
@@ -113,11 +113,20 @@ class TriviaGameViewMvc(
         buttonNext.visibility = if (show) View.VISIBLE else View.GONE
     }
 
-    override fun onCorrect(isCorrect: Boolean) {
-        Snackbar.make(getRootView(), getContext().getString(R.string.right_question_overlay, isCorrect), Snackbar.LENGTH_SHORT).show()
+    override fun onAnswerClicked(answer: Answer, answersViewMvc: IAnswersItemViewMvc) {
         for (listener in getListeners()){
-            listener.onAnswerClicked(isCorrect)
+            listener.onAnswerClicked(answer, answersViewMvc)
         }
+    }
+
+    override fun onCorrectAnswerFound(answersItemViewMvc: IAnswersItemViewMvc) {
+        for (listener in getListeners()){
+            listener.onCorrectAnswerFound(answersItemViewMvc)
+        }
+    }
+
+    override fun updateCorrectQuestion() {
+        answersRecyclerAdapter.updateCorrectQuestion()
     }
 
     companion object {

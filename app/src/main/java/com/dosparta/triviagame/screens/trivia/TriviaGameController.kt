@@ -4,12 +4,14 @@ import android.os.Bundle
 import android.util.Log
 import com.android.volley.VolleyError
 import com.dosparta.triviagame.common.Utils
+import com.dosparta.triviagame.questions.Answer
 import com.dosparta.triviagame.questions.FetchTriviaQuestionsUseCase
 import com.dosparta.triviagame.questions.Question
 import com.dosparta.triviagame.screens.common.ActivityUtils
 import com.dosparta.triviagame.screens.common.popups.AlertDialogListener
 import com.dosparta.triviagame.screens.common.popups.OverlayMessagesHelper
 import com.dosparta.triviagame.screens.common.screensnavigator.ScreensNavigator
+import com.dosparta.triviagame.screens.trivia.answersitem.IAnswersItemViewMvc
 
 class TriviaGameController(
     private val fetchTriviaQuestionsUseCase: FetchTriviaQuestionsUseCase,
@@ -91,10 +93,16 @@ class TriviaGameController(
         viewMvc.showErrorDialog(statusCode, answerListener)
     }
 
-    override fun onAnswerClicked(isCorrect: Boolean) {
+    override fun onAnswerClicked(answer: Answer, answersViewMvc: IAnswersItemViewMvc) {
+        val isCorrect = answer.correct
+        answersViewMvc.updateTintColor(answer.correct)
+
         if (isCorrect) {
             ++correctAnswers
+        } else {
+            viewMvc.updateCorrectQuestion()
         }
+
         viewMvc.showButtonNext(true)
         moveToNextQuestionWithDelay()
     }
@@ -108,6 +116,10 @@ class TriviaGameController(
     override fun onButtonNextClicked() {
         activityUtils.removeCallbacksAndMessages(null)
         moveToNextQuestion()
+    }
+
+    override fun onCorrectAnswerFound(answersItemViewMvc: IAnswersItemViewMvc) {
+        answersItemViewMvc.updateTintColor(true)
     }
 
     private fun moveToNextQuestion() {

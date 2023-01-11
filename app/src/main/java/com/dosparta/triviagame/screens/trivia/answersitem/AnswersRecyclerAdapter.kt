@@ -25,14 +25,10 @@ class AnswersRecyclerAdapter(
     }
 
     override fun onAnswerClicked(answer: Answer, viewMvc: IAnswersItemViewMvc) {
-        val isCorrect = answer.correct
-        viewMvc.updateTintColor(answer.correct)
-        if (!isCorrect)
-            updateCorrectQuestion()
-        listener.onCorrect(isCorrect)
+        listener.onAnswerClicked(answer, viewMvc)
     }
 
-    private fun updateCorrectQuestion() {
+    fun updateCorrectQuestion() {
         for (i in answers.indices) {
             if (answers[i].correct) {
                 notifyItemChanged(i, HIGHLIGHT_CORRECT_ANSWER)
@@ -46,6 +42,7 @@ class AnswersRecyclerAdapter(
         for (payload in payloads){
             if (payload is String && payload == HIGHLIGHT_CORRECT_ANSWER) {
                 holder.answersItemViewMvc.updateTintColor(true)
+                listener.onCorrectAnswerFound(holder.answersItemViewMvc)
                 break
             }
         }
