@@ -76,23 +76,6 @@ class TriviaGameViewMvc(
         answersRecyclerView.adapter = answersRecyclerAdapter
     }
 
-    override fun showResults(correctAnswers: Int, totalAnswers: Int, answerListener: AlertDialogListener) {
-        val builder = AlertDialog.Builder(getContext())
-        val correctAnswersOverTotal = (correctAnswers * HUNDRED_PERCENT) / totalAnswers
-        builder.setTitle(R.string.game_over_popup_title)
-            .setMessage(getContext().getString(R.string.game_over_popup_msg, correctAnswers, totalAnswers, correctAnswersOverTotal))
-            .setPositiveButton(R.string.game_over_popup_positive_msg) { dialog, _ ->
-                dialog.dismiss()
-                answerListener.onPositiveAnswer()
-            }
-            .setNegativeButton(R.string.game_over_popup_negative_msg){ dialog, _ ->
-                dialog.dismiss()
-                answerListener.onNegativeAnswer()
-            }
-            .setCancelable(false)
-            .show()
-    }
-
     override fun showErrorDialog(statusCode: Int, answerListener: AlertDialogListener) {
         val builder = AlertDialog.Builder(getContext())
         builder.setTitle(getContext().getString(R.string.network_error_popup_title, statusCode))

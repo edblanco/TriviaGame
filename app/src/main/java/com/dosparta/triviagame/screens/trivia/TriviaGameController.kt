@@ -8,6 +8,7 @@ import com.dosparta.triviagame.questions.Answer
 import com.dosparta.triviagame.questions.FetchTriviaQuestionsUseCase
 import com.dosparta.triviagame.questions.Question
 import com.dosparta.triviagame.screens.common.ActivityUtils
+import com.dosparta.triviagame.screens.common.dialogs.DialogManager
 import com.dosparta.triviagame.screens.common.popups.AlertDialogListener
 import com.dosparta.triviagame.screens.common.popups.OverlayMessagesHelper
 import com.dosparta.triviagame.screens.common.screensnavigator.ScreensNavigator
@@ -16,8 +17,9 @@ import com.dosparta.triviagame.screens.trivia.answersitem.IAnswersItemViewMvc
 class TriviaGameController(
     private val fetchTriviaQuestionsUseCase: FetchTriviaQuestionsUseCase,
     private val screensNavigator: ScreensNavigator,
-    private val overlayMessagesHelper: OverlayMessagesHelper,
-    private val activityUtils: ActivityUtils
+    private val dialogManager: DialogManager,
+    private val overlayMessagesHelper: OverlayMessagesHelper, // todo no need to show snack bars anymore
+    private val activityUtils: ActivityUtils // todo could be instantiated directly in the class
 ) : ITriviaGameController, ITriviaGameViewMvc.Listener, FetchTriviaQuestionsUseCase.Listener {
 
     private var questions: List<Question> = listOf()
@@ -27,6 +29,8 @@ class TriviaGameController(
 
     private var _viewMvc: ITriviaGameViewMvc? = null
     private val viewMvc get() = _viewMvc!!
+
+
 
     override fun onStart() {
         viewMvc.registerListener(this)
@@ -145,7 +149,7 @@ class TriviaGameController(
                 resetGame()
             }
         }
-        viewMvc.showResults(correctAnswers, questions.size, answerListener)
+        dialogManager.showResults(correctAnswers, questions.size, answerListener)
     }
 
     private fun resetGame() {
