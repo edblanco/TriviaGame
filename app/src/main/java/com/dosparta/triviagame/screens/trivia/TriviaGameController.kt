@@ -94,7 +94,7 @@ class TriviaGameController(
                 screensNavigator.closeApp()
             }
         }
-        viewMvc.showErrorDialog(statusCode, answerListener)
+        dialogManager.showErrorDialog(statusCode, answerListener)
     }
 
     override fun onAnswerClicked(answer: Answer, answersViewMvc: IAnswersItemViewMvc) {

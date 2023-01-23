@@ -27,4 +27,20 @@ class DialogManager(private val context: Context) {
             .setCancelable(false)
             .show()
     }
+
+    fun showErrorDialog(statusCode: Int, answerListener: AlertDialogListener) {
+        val builder = AlertDialog.Builder(context)
+        builder.setTitle(context.getString(R.string.network_error_popup_title, statusCode))
+            .setMessage(R.string.network_error_popup_msg)
+            .setPositiveButton(R.string.network_error_popup_positive_msg) { dialog, _ ->
+                dialog.dismiss()
+                answerListener.onPositiveAnswer()
+            }
+            .setNegativeButton(R.string.network_error_popup_negative_msg) { dialog, _ ->
+                dialog.dismiss()
+                answerListener.onNegativeAnswer()
+            }
+            .setCancelable(false)
+            .show()
+    }
 }

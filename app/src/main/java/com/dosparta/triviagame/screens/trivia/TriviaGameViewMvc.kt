@@ -76,22 +76,6 @@ class TriviaGameViewMvc(
         answersRecyclerView.adapter = answersRecyclerAdapter
     }
 
-    override fun showErrorDialog(statusCode: Int, answerListener: AlertDialogListener) {
-        val builder = AlertDialog.Builder(getContext())
-        builder.setTitle(getContext().getString(R.string.network_error_popup_title, statusCode))
-            .setMessage(R.string.network_error_popup_msg)
-            .setPositiveButton(R.string.network_error_popup_positive_msg) { dialog, _ ->
-                dialog.dismiss()
-                answerListener.onPositiveAnswer()
-            }
-            .setNegativeButton(R.string.network_error_popup_negative_msg) { dialog, _ ->
-                dialog.dismiss()
-                answerListener.onNegativeAnswer()
-            }
-            .setCancelable(false)
-            .show()
-    }
-
     override fun showButtonNext(show: Boolean) {
         buttonNext.visibility = if (show) View.VISIBLE else View.GONE
     }
