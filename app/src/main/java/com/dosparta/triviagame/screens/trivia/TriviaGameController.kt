@@ -46,8 +46,9 @@ class TriviaGameController(
     }
 
     override fun onResume() {
+        // todo How many questions you want?
         if (questions.isEmpty()) {
-            fetchTriviaQuestionsUseCase.fetchTriviaQuestionsAndNotify()
+            fetchQuestions()
         } else {
             onTriviaQuestionsFetched(questions)
         }
@@ -63,6 +64,21 @@ class TriviaGameController(
     override fun onStop() {
         viewMvc.unregisterListener(this)
         fetchTriviaQuestionsUseCase.unregisterListener(this)
+    }
+
+    private fun fetchQuestions() {
+        val answerListener = object : AlertDialogListener {
+            override fun onPositiveAnswer(value: String?) {
+                value?.let {
+                    fetchTriviaQuestionsUseCase.fetchTriviaQuestionsAndNotify(value)
+                }
+            }
+
+            override fun onNegativeAnswer() {
+
+            }
+        }
+        dialogManager.getAmountOfQuestionsDialog(answerListener)
     }
 
     override fun onTriviaQuestionsFetched(questions: List<Question>) {
@@ -85,7 +101,7 @@ class TriviaGameController(
 
     private fun showErrorDialog(statusCode: Int) {
         val answerListener = object : AlertDialogListener {
-            override fun onPositiveAnswer() {
+            override fun onPositiveAnswer(value: String?) {
                 screensNavigator.toTriviaGame()
                 screensNavigator.closeScreen()
             }
@@ -140,7 +156,7 @@ class TriviaGameController(
 
     private fun showResults() {
         val answerListener = object : AlertDialogListener {
-            override fun onPositiveAnswer() {
+            override fun onPositiveAnswer(value: String?) {
                 screensNavigator.toTriviaGame()
                 screensNavigator.closeScreen()
             }

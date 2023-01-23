@@ -19,8 +19,8 @@ class FetchTriviaQuestionsUseCase(private val volleyInstance: VolleySingleton): 
         fun onTriviaQuestionsFetchFailed(error: VolleyError?) //todo re-work error. Activity should not know how questions are fetched
     }
 
-    fun fetchTriviaQuestionsAndNotify() {
-        val stringRequest = StringRequest(Request.Method.GET, Utils.TRIVIA_API_URL, { response ->
+    fun fetchTriviaQuestionsAndNotify(questionsAmount: String) {
+        val stringRequest = StringRequest(Request.Method.GET, Utils.TRIVIA_API_URL + questionsAmount, { response ->
             notifySuccess(parseResponse(response))
         }, {
             notifyFailure(it)
