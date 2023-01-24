@@ -30,10 +30,10 @@ class DialogManager(private val context: Context) {
             .show()
     }
 
-    fun showErrorDialog(statusCode: Int, answerListener: AlertDialogListener) {
+    fun showErrorDialog(statusCode: Int, message: Int, answerListener: AlertDialogListener) {
         val builder = AlertDialog.Builder(context)
         builder.setTitle(context.getString(R.string.network_error_popup_title, statusCode))
-            .setMessage(R.string.network_error_popup_msg)
+            .setMessage(message)
             .setPositiveButton(R.string.network_error_popup_positive_msg) { dialog, _ ->
                 dialog.dismiss()
                 answerListener.onPositiveAnswer(null)

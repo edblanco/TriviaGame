@@ -2,7 +2,8 @@ package com.dosparta.triviagame.screens.trivia
 
 import android.os.Bundle
 import android.util.Log
-import com.android.volley.VolleyError
+import com.android.volley.*
+import com.dosparta.triviagame.R
 import com.dosparta.triviagame.common.Utils
 import com.dosparta.triviagame.questions.Answer
 import com.dosparta.triviagame.questions.FetchTriviaQuestionsUseCase
@@ -46,7 +47,6 @@ class TriviaGameController(
     }
 
     override fun onResume() {
-        // todo How many questions you want?
         if (questions.isEmpty()) {
             fetchQuestions()
         } else {
@@ -90,16 +90,38 @@ class TriviaGameController(
         }
     }
 
+    // todo On retry it should not ask the amount of questions again
     override fun onTriviaQuestionsFetchFailed(error: VolleyError?) {
         Log.i(tag, "Unable to retrieve data: ${error?.networkResponse}")
-        showErrorDialog(if (error?.networkResponse != null) error.networkResponse.statusCode else Utils.INTERNAL_SERVER_ERROR)
+        val message = getMessageFromError(error)
+        showErrorDialog(if (error?.networkResponse != null) error.networkResponse.statusCode else Utils.INTERNAL_SERVER_ERROR, message)
+    }
+
+    private fun getMessageFromError(volleyError: VolleyError?): Int {
+        return when (volleyError) {
+            is NoConnectionError, is AuthFailureError, is NetworkError -> {
+                R.string.no_internet_connection_error_msg
+            }
+            is ServerError -> {
+                R.string.server_error_msg
+            }
+            is ParseError -> {
+                R.string.network_error_popup_msg
+            }
+            is TimeoutError -> {
+                R.string.timeout_network_error_msg
+            }
+            else -> {
+                R.string.network_error_popup_msg
+            }
+        }
     }
 
     override fun bindView(viewMvc: ITriviaGameViewMvc) {
         _viewMvc = viewMvc
     }
 
-    private fun showErrorDialog(statusCode: Int) {
+    private fun showErrorDialog(statusCode: Int, message: Int) {
         val answerListener = object : AlertDialogListener {
             override fun onPositiveAnswer(value: String?) {
                 screensNavigator.toTriviaGame()
@@ -110,7 +132,7 @@ class TriviaGameController(
                 screensNavigator.closeApp()
             }
         }
-        dialogManager.showErrorDialog(statusCode, answerListener)
+        dialogManager.showErrorDialog(statusCode, message, answerListener)
     }
 
     override fun onAnswerClicked(answer: Answer, answersViewMvc: IAnswersItemViewMvc) {

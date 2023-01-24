@@ -24,5 +24,8 @@
     <string name="right_question_overlay">Your answers was %b</string>
     <string name="amount_of_questions_title">Amount of questions (up to 50)</string>
     <string name="amount_of_question_message">Choose the amount of questions (up to 50)</string>
+    <string name="timeout_network_error_msg">Connection TimeOut! Please check your internet connection and try again.</string>
+    <string name="server_error_msg">The server could not be found. Please try again after some time.</string>
+    <string name="no_internet_connection_error_msg">Cannot connect to Internet...Please check your connection and try again.</string>
 
 </resources>
