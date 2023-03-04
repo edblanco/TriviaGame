@@ -1,18 +1,20 @@
 package com.dosparta.triviagame.common.dependencyinjection
 
-import android.app.Activity
 import android.view.LayoutInflater
+import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentManager
 import com.dosparta.triviagame.networking.VolleySingleton
 import com.dosparta.triviagame.questions.FetchTriviaQuestionsUseCase
 import com.dosparta.triviagame.screens.common.ActivityUtils
+import com.dosparta.triviagame.screens.common.ViewMvcFactory
+import com.dosparta.triviagame.screens.common.dialogs.DialogsManager
+import com.dosparta.triviagame.screens.common.dialogs.DialogsEventBus
 import com.dosparta.triviagame.screens.common.popups.OverlayMessagesHelper
 import com.dosparta.triviagame.screens.common.screensnavigator.ScreensNavigator
-import com.dosparta.triviagame.screens.common.ViewMvcFactory
-import com.dosparta.triviagame.screens.common.dialogs.DialogManager
 import com.dosparta.triviagame.screens.trivia.ITriviaGameController
 import com.dosparta.triviagame.screens.trivia.TriviaGameController
 
-class ControllerCompositionRoot(private val compositionRoot: CompositionRoot, private val activity: Activity) {
+class ControllerCompositionRoot(private val compositionRoot: CompositionRoot, private val activity: FragmentActivity) {
 
     private fun getVolleyInstance(): VolleySingleton {
         return compositionRoot.getVolleyInstance(activity)
@@ -26,17 +28,21 @@ class ControllerCompositionRoot(private val compositionRoot: CompositionRoot, pr
         return ViewMvcFactory(getLayoutInflater())
     }
 
+    private fun getFragmentManager(): FragmentManager {
+        return activity.supportFragmentManager
+    }
+
     private fun getFetchTriviaQuestionsUseCase(): FetchTriviaQuestionsUseCase {
         return FetchTriviaQuestionsUseCase(getVolleyInstance())
     }
 
     fun getTriviaGameController(): ITriviaGameController {
-        // todo: move screen navigator and MessagesDisplayer to ActivityUtils
-        return TriviaGameController(getFetchTriviaQuestionsUseCase(), getScreensNavigator(), getDialogManager(), getMessagesDisplayer(), getActivityUtils())
+        // todo: move screen navigator and MessagesDisplayer to ActivityUtils ... Pass controller composition root
+        return TriviaGameController(getFetchTriviaQuestionsUseCase(), getScreensNavigator(), getDialogManager(), getMessagesDisplayer(), getActivityUtils(), getDialogsEventBus())
     }
 
-    private fun getDialogManager(): DialogManager {
-        return DialogManager(activity)
+    private fun getDialogManager(): DialogsManager {
+        return DialogsManager(activity, getFragmentManager())
     }
 
     private fun getScreensNavigator(): ScreensNavigator {
@@ -49,5 +55,9 @@ class ControllerCompositionRoot(private val compositionRoot: CompositionRoot, pr
 
     private fun getActivityUtils(): ActivityUtils {
         return ActivityUtils(activity)
+    }
+
+    fun getDialogsEventBus(): DialogsEventBus {
+        return compositionRoot.getDialogsEventBus()
     }
 }

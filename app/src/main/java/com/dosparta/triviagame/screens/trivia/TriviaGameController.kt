@@ -9,7 +9,10 @@ import com.dosparta.triviagame.questions.Answer
 import com.dosparta.triviagame.questions.FetchTriviaQuestionsUseCase
 import com.dosparta.triviagame.questions.Question
 import com.dosparta.triviagame.screens.common.ActivityUtils
-import com.dosparta.triviagame.screens.common.dialogs.DialogManager
+import com.dosparta.triviagame.screens.common.dialogs.DialogsManager
+import com.dosparta.triviagame.screens.common.dialogs.DialogsEventBus
+import com.dosparta.triviagame.screens.common.dialogs.promptdialog.PromptDialogEvent
+import com.dosparta.triviagame.screens.common.dialogs.questionsdialog.QuestionsDialogEvent
 import com.dosparta.triviagame.screens.common.popups.AlertDialogListener
 import com.dosparta.triviagame.screens.common.popups.OverlayMessagesHelper
 import com.dosparta.triviagame.screens.common.screensnavigator.ScreensNavigator
@@ -18,37 +21,55 @@ import com.dosparta.triviagame.screens.trivia.answersitem.IAnswersItemViewMvc
 class TriviaGameController(
     private val fetchTriviaQuestionsUseCase: FetchTriviaQuestionsUseCase,
     private val screensNavigator: ScreensNavigator,
-    private val dialogManager: DialogManager,
+    private val dialogsManager: DialogsManager,
     private val overlayMessagesHelper: OverlayMessagesHelper, // todo no need to show snack bars anymore
-    private val activityUtils: ActivityUtils // todo could be instantiated directly in the class
-) : ITriviaGameController, ITriviaGameViewMvc.Listener, FetchTriviaQuestionsUseCase.Listener {
+    private val activityUtils: ActivityUtils,
+    private val dialogsEventBus: DialogsEventBus,
+) : ITriviaGameController, ITriviaGameViewMvc.Listener, FetchTriviaQuestionsUseCase.Listener,
+    DialogsEventBus.Listener {
+
+    companion object {
+        private val tag = TriviaGameActivity::class.java.simpleName
+        private const val JUMP_TO_NEXT_QUESTION_DELAY = 3000L
+        private const val CURRENT_QUESTION = "CURRENT_QUESTION"
+        private const val CORRECT_ANSWERS = "CORRECT_ANSWERS"
+        private const val QUESTIONS = "QUESTIONS"
+        private const val SCREEN_STATE = "SCREEN_STATE"
+
+        private const val INITIAL_SETUP_DIALOG_TAG = "INITIAL_SETUP_DIALOG"
+        private const val SHOW_RESULTS_DIALOG_TAG = "SHOW_RESULTS_DIALOG_TAG"
+        private const val SHOW_ERROR_DIALOG_TAG = "SHOW_ERROR_DIALOG_TAG"
+    }
+    private enum class ScreenState {
+        IDLE, INITIAL_SETUP_SHOWN
+    }
 
     private var questions: List<Question> = listOf()
     private var currentQuestion: Int = 0
     private var correctAnswers: Int = 0
-    private var isGameOver = false
 
     private var _viewMvc: ITriviaGameViewMvc? = null
     private val viewMvc get() = _viewMvc!!
 
-
+    private var screenState = ScreenState.IDLE
 
     override fun onStart() {
         viewMvc.registerListener(this)
         fetchTriviaQuestionsUseCase.registerListener(this)
+        dialogsEventBus.registerListener(this)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         currentQuestion = savedInstanceState.getInt(CURRENT_QUESTION)
         correctAnswers = savedInstanceState.getInt(CORRECT_ANSWERS)
-        isGameOver = savedInstanceState.getBoolean(GAME_OVER)
         questions =
             savedInstanceState.getParcelableArrayList<Question>(QUESTIONS)?.toList() ?: questions
+        screenState = savedInstanceState.getSerializable(SCREEN_STATE) as ScreenState
     }
 
     override fun onResume() {
         if (questions.isEmpty()) {
-            fetchQuestions()
+            fetchQuestionsSetup()
         } else {
             onTriviaQuestionsFetched(questions)
         }
@@ -57,37 +78,27 @@ class TriviaGameController(
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putInt(CURRENT_QUESTION, currentQuestion)
         outState.putInt(CORRECT_ANSWERS, correctAnswers)
-        outState.putBoolean(GAME_OVER, isGameOver)
         outState.putParcelableArrayList(QUESTIONS, ArrayList(questions))
+        outState.putSerializable(SCREEN_STATE, screenState)
     }
 
     override fun onStop() {
         viewMvc.unregisterListener(this)
         fetchTriviaQuestionsUseCase.unregisterListener(this)
+        dialogsEventBus.unregisterListener(this)
     }
 
-    private fun fetchQuestions() {
-        val answerListener = object : AlertDialogListener {
-            override fun onPositiveAnswer(value: String?) {
-                value?.let {
-                    fetchTriviaQuestionsUseCase.fetchTriviaQuestionsAndNotify(value)
-                }
-            }
-
-            override fun onNegativeAnswer() {
-
-            }
+    private fun fetchQuestionsSetup() {
+        if (screenState == ScreenState.IDLE) {
+            screenState = ScreenState.INITIAL_SETUP_SHOWN
+            dialogsManager.showQuestionsAmountUseCaseDialog(INITIAL_SETUP_DIALOG_TAG)
         }
-        dialogManager.getAmountOfQuestionsDialog(answerListener)
     }
 
     override fun onTriviaQuestionsFetched(questions: List<Question>) {
         this.questions = questions
         viewMvc.bindQuestions(currentQuestion, questions)
         viewMvc.setLoadingState(false)
-        if (isGameOver) {
-            showResults()
-        }
     }
 
     // todo On retry it should not ask the amount of questions again
@@ -122,17 +133,7 @@ class TriviaGameController(
     }
 
     private fun showErrorDialog(statusCode: Int, message: Int) {
-        val answerListener = object : AlertDialogListener {
-            override fun onPositiveAnswer(value: String?) {
-                screensNavigator.toTriviaGame()
-                screensNavigator.closeScreen()
-            }
-
-            override fun onNegativeAnswer() {
-                screensNavigator.closeApp()
-            }
-        }
-        dialogManager.showErrorDialog(statusCode, message, answerListener)
+        dialogsManager.showErrorUseCaseDialog(statusCode, message, SHOW_ERROR_DIALOG_TAG)
     }
 
     override fun onAnswerClicked(answer: Answer, answersViewMvc: IAnswersItemViewMvc) {
@@ -167,7 +168,6 @@ class TriviaGameController(
     private fun moveToNextQuestion() {
         if (currentQuestion == (questions.size - 1)) {
             overlayMessagesHelper.showGameOverOverlay(correctAnswers, questions.size)
-            isGameOver = true
             showResults()
             return
         }
@@ -177,32 +177,60 @@ class TriviaGameController(
     }
 
     private fun showResults() {
-        val answerListener = object : AlertDialogListener {
-            override fun onPositiveAnswer(value: String?) {
-                screensNavigator.toTriviaGame()
-                screensNavigator.closeScreen()
-            }
-
-            override fun onNegativeAnswer() {
-                resetGame()
-            }
-        }
-        dialogManager.showResults(correctAnswers, questions.size, answerListener)
+        dialogsManager.showResultsUseCaseDialog(correctAnswers, questions.size,
+            SHOW_RESULTS_DIALOG_TAG
+        )
     }
 
     private fun resetGame() {
         correctAnswers = 0
         currentQuestion = 0
-        isGameOver = false
+        viewMvc.showButtonNext(false)
         viewMvc.bindQuestions(currentQuestion, questions)
     }
 
-    companion object {
-        private val tag = TriviaGameActivity::class.java.simpleName
-        private const val JUMP_TO_NEXT_QUESTION_DELAY = 3000L
-        private const val CURRENT_QUESTION = "CURRENT_QUESTION"
-        private const val CORRECT_ANSWERS = "CORRECT_ANSWERS"
-        private const val QUESTIONS = "QUESTIONS"
-        private const val GAME_OVER = "GAME_OVER"
+    override fun onDialogEvent(event: Any) {
+        val dialogTag = dialogsManager.getShownDialogTag()
+        if (INITIAL_SETUP_DIALOG_TAG == dialogTag) {
+            handleInitialSetupDialogEvent(event)
+        } else if (SHOW_RESULTS_DIALOG_TAG == dialogTag) {
+            handleResultsDialogEvent(event)
+        } else if (SHOW_ERROR_DIALOG_TAG == dialogTag) {
+            handleErrorDialogEvent(event)
+        }
+    }
+
+    private fun handleInitialSetupDialogEvent(event: Any) {
+        screenState = ScreenState.IDLE
+        val questionsAmount = (event as QuestionsDialogEvent).getQuestionsAmount()
+        fetchTriviaQuestionsUseCase.fetchTriviaQuestionsAndNotify(questionsAmount)
+    }
+
+    private fun handleResultsDialogEvent(event: Any) {
+        (event as PromptDialogEvent).let {
+            when (it.getClickedButton()) {
+                PromptDialogEvent.Button.POSITIVE -> {
+                    screensNavigator.toTriviaGame()
+                    screensNavigator.closeScreen()
+                }
+                PromptDialogEvent.Button.NEGATIVE -> {
+                    resetGame()
+                }
+            }
+        }
+    }
+
+    private fun handleErrorDialogEvent(event: Any) {
+        (event as PromptDialogEvent).let {
+            when (it.getClickedButton()) {
+                PromptDialogEvent.Button.POSITIVE -> {
+                    screensNavigator.toTriviaGame()
+                    screensNavigator.closeScreen()
+                }
+                PromptDialogEvent.Button.NEGATIVE -> {
+                    screensNavigator.closeApp()
+                }
+            }
+        }
     }
 }

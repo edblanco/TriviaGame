@@ -61,12 +61,11 @@
 
                 <TextView
                     android:id="@+id/question_textview"
-                    style="@style/NormalTextStyle"
+                    style="@style/StandardTextMediumStyle.White"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="@dimen/question_text_padding"
-                    android:text="@string/loading_question"
-                    android:textColor="@color/white" />
+                    android:text="@string/loading_question" />
             </androidx.cardview.widget.CardView>
 
             <androidx.recyclerview.widget.RecyclerView
