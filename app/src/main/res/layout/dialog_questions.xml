@@ -9,7 +9,7 @@
     <TextView
         android:id="@+id/title"
         style="@style/StandardTextMediumStyle.White"
-        android:text="Select amount of questions"
+        android:text="@string/select_questions_amount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
@@ -36,7 +36,7 @@
     <Button
         android:id="@+id/button_continue"
         style="@style/ButtonStyle"
-        android:text="Continue"
+        android:text="@string/continue_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/spinner_questions_amount"

@@ -27,5 +27,7 @@
     <string name="timeout_network_error_msg">Connection TimeOut! Please check your internet connection and try again.</string>
     <string name="server_error_msg">The server could not be found. Please try again after some time.</string>
     <string name="no_internet_connection_error_msg">Cannot connect to Internet...Please check your connection and try again.</string>
+    <string name="select_questions_amount">Select amount of questions</string>
+    <string name="continue_btn">Continue</string>
 
 </resources>
