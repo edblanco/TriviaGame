@@ -17,7 +17,7 @@ class FetchTriviaQuestionsUseCase(private val volleyInstance: VolleySingleton) :
 
     interface Listener {
         fun onTriviaQuestionsFetched(questions: List<Question>)
-        fun onTriviaQuestionsFetchFailed(error: Exception?) //todo re-work error. Activity should not know how questions are fetched
+        fun onTriviaQuestionsFetchFailed(error: Exception?)
     }
 
     fun fetchTriviaQuestionsAndNotify(questionsAmount: String) {

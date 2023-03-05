@@ -8,14 +8,13 @@ import com.dosparta.triviagame.R
 import com.dosparta.triviagame.screens.common.dialogs.BaseDialog
 import com.dosparta.triviagame.screens.common.dialogs.DialogsEventBus
 
-// todo remove open if not inherited
-open class PromptDialog : BaseDialog() {
+class PromptDialog : BaseDialog() {
 
     companion object {
-        protected const val ARG_TITLE = "ARG_TITLE"
-        protected const val ARG_MESSAGE = "ARG_MESSAGE"
-        protected const val ARG_POSITIVE_BUTTON_CAPTION = "ARG_POSITIVE_BUTTON_CAPTION"
-        protected const val ARG_NEGATIVE_BUTTON_CAPTION = "ARG_NEGATIVE_BUTTON_CAPTION"
+        private const val ARG_TITLE = "ARG_TITLE"
+        private const val ARG_MESSAGE = "ARG_MESSAGE"
+        private const val ARG_POSITIVE_BUTTON_CAPTION = "ARG_POSITIVE_BUTTON_CAPTION"
+        private const val ARG_NEGATIVE_BUTTON_CAPTION = "ARG_NEGATIVE_BUTTON_CAPTION"
         fun newPromptDialog(
             title: String?,
             message: String?,
@@ -33,11 +32,10 @@ open class PromptDialog : BaseDialog() {
         }
     }
 
-    // todo remove m from members
-    private lateinit var mTxtTitle: TextView
-    private lateinit var mTxtMessage: TextView
-    private lateinit var mBtnPositive: Button
-    private lateinit var mBtnNegative: Button
+    private lateinit var txtTitle: TextView
+    private lateinit var txtMessage: TextView
+    private lateinit var btnPositive: Button
+    private lateinit var btnNegative: Button
 
     private var dialogsEventBus: DialogsEventBus? = null
 
@@ -50,27 +48,27 @@ open class PromptDialog : BaseDialog() {
         checkNotNull(arguments) { "arguments mustn't be null" }
         val dialog = Dialog(requireContext())
         dialog.setContentView(R.layout.dialog_prompt)
-        mTxtTitle = dialog.findViewById(R.id.txt_title)
-        mTxtMessage = dialog.findViewById(R.id.txt_message)
-        mBtnPositive = dialog.findViewById(R.id.btn_positive)
-        mBtnNegative = dialog.findViewById(R.id.btn_negative)
+        txtTitle = dialog.findViewById(R.id.txt_title)
+        txtMessage = dialog.findViewById(R.id.txt_message)
+        btnPositive = dialog.findViewById(R.id.btn_positive)
+        btnNegative = dialog.findViewById(R.id.btn_negative)
         arguments?.let {
-            mTxtTitle.text = arguments?.getString(ARG_TITLE)
-            mTxtMessage.text = arguments?.getString(ARG_MESSAGE)
-            mBtnPositive.text = arguments?.getString(ARG_POSITIVE_BUTTON_CAPTION)
-            mBtnNegative.text = arguments?.getString(ARG_NEGATIVE_BUTTON_CAPTION)
+            txtTitle.text = arguments?.getString(ARG_TITLE)
+            txtMessage.text = arguments?.getString(ARG_MESSAGE)
+            btnPositive.text = arguments?.getString(ARG_POSITIVE_BUTTON_CAPTION)
+            btnNegative.text = arguments?.getString(ARG_NEGATIVE_BUTTON_CAPTION)
         }
-        mBtnPositive.setOnClickListener { onPositiveButtonClicked() }
-        mBtnNegative.setOnClickListener { onNegativeButtonClicked() }
+        btnPositive.setOnClickListener { onPositiveButtonClicked() }
+        btnNegative.setOnClickListener { onNegativeButtonClicked() }
         return dialog
     }
 
-    protected fun onPositiveButtonClicked() {
+    private fun onPositiveButtonClicked() {
         dismiss()
         dialogsEventBus?.postEvent(PromptDialogEvent(PromptDialogEvent.Button.POSITIVE))
     }
 
-    protected fun onNegativeButtonClicked() {
+    private fun onNegativeButtonClicked() {
         dismiss()
         dialogsEventBus?.postEvent(PromptDialogEvent(PromptDialogEvent.Button.NEGATIVE))
     }
