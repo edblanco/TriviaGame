@@ -5,26 +5,17 @@ import android.util.Log
 import com.android.volley.*
 import com.dosparta.triviagame.R
 import com.dosparta.triviagame.common.Utils
+import com.dosparta.triviagame.common.dependencyinjection.ControllerCompositionRoot
 import com.dosparta.triviagame.questions.Answer
 import com.dosparta.triviagame.questions.FetchTriviaQuestionsUseCase
 import com.dosparta.triviagame.questions.Question
-import com.dosparta.triviagame.screens.common.ActivityUtils
 import com.dosparta.triviagame.screens.common.dialogs.DialogsEventBus
-import com.dosparta.triviagame.screens.common.dialogs.DialogsManager
 import com.dosparta.triviagame.screens.common.dialogs.promptdialog.PromptDialogEvent
 import com.dosparta.triviagame.screens.common.dialogs.questionsdialog.QuestionsDialogEvent
-import com.dosparta.triviagame.screens.common.popups.OverlayMessagesHelper
-import com.dosparta.triviagame.screens.common.screensnavigator.ScreensNavigator
 import com.dosparta.triviagame.screens.trivia.answersitem.IAnswersItemViewMvc
 
-class TriviaGameController(
-    private val fetchTriviaQuestionsUseCase: FetchTriviaQuestionsUseCase,
-    private val screensNavigator: ScreensNavigator,
-    private val dialogsManager: DialogsManager,
-    private val overlayMessagesHelper: OverlayMessagesHelper, // todo no need to show snack bars anymore
-    private val activityUtils: ActivityUtils,
-    private val dialogsEventBus: DialogsEventBus,
-) : ITriviaGameController, ITriviaGameViewMvc.Listener, FetchTriviaQuestionsUseCase.Listener,
+class TriviaGameController(controllerCompositionRoot: ControllerCompositionRoot) :
+    ITriviaGameController, ITriviaGameViewMvc.Listener, FetchTriviaQuestionsUseCase.Listener,
     DialogsEventBus.Listener {
 
     companion object {
@@ -39,6 +30,7 @@ class TriviaGameController(
         private const val SHOW_RESULTS_DIALOG_TAG = "SHOW_RESULTS_DIALOG_TAG"
         private const val SHOW_ERROR_DIALOG_TAG = "SHOW_ERROR_DIALOG_TAG"
     }
+
     private enum class ScreenState {
         IDLE, INITIAL_SETUP_SHOWN, ANSWER_SELECTED
     }
@@ -51,6 +43,15 @@ class TriviaGameController(
     private val viewMvc get() = _viewMvc!!
 
     private var screenState = ScreenState.IDLE
+
+    private val fetchTriviaQuestionsUseCase =
+        controllerCompositionRoot.getFetchTriviaQuestionsUseCase()
+    private val screensNavigator = controllerCompositionRoot.getScreensNavigator()
+    private val dialogsManager = controllerCompositionRoot.getDialogManager()
+    private val overlayMessagesHelper =
+        controllerCompositionRoot.getMessagesDisplayer() // todo no need to show snack bars anymore
+    private val activityUtils = controllerCompositionRoot.getActivityUtils()
+    private val dialogsEventBus = controllerCompositionRoot.getDialogsEventBus()
 
     override fun onStart() {
         viewMvc.registerListener(this)
@@ -104,7 +105,10 @@ class TriviaGameController(
     override fun onTriviaQuestionsFetchFailed(error: VolleyError?) {
         Log.i(tag, "Unable to retrieve data: ${error?.networkResponse}")
         val message = getMessageFromError(error)
-        showErrorDialog(if (error?.networkResponse != null) error.networkResponse.statusCode else Utils.INTERNAL_SERVER_ERROR, message)
+        showErrorDialog(
+            if (error?.networkResponse != null) error.networkResponse.statusCode else Utils.INTERNAL_SERVER_ERROR,
+            message
+        )
     }
 
     private fun getMessageFromError(volleyError: VolleyError?): Int {
@@ -185,7 +189,8 @@ class TriviaGameController(
     }
 
     private fun showResults() {
-        dialogsManager.showResultsUseCaseDialog(correctAnswers, questions.size,
+        dialogsManager.showResultsUseCaseDialog(
+            correctAnswers, questions.size,
             SHOW_RESULTS_DIALOG_TAG, false
         )
     }
