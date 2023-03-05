@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="MainTextStyle"> <!-- TODO: REMOVE. Should not contain width, height or margin values -->
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginTop">16dp</item>
+    <style name="MainTextStyle">
+        <item name="android:fontFamily">sans-serif</item>
     </style>
 
     <style name="TitleTextStyle" parent="MainTextStyle">

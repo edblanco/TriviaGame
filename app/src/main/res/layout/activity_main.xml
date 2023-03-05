@@ -13,6 +13,9 @@
         style="@style/TitleTextStyle"
         android:text="@string/title_text"
         android:textColor="@color/light_gray_txt_color"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.07"
         app:layout_constraintStart_toStartOf="parent"
@@ -35,10 +38,10 @@
             <TextView
                 android:id="@+id/text_view_out_of"
                 style="@style/TitleTextStyle.White"
+                android:text="@string/loading_question_out_of_questions"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:text="@string/loading_question_out_of_questions"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.16"
                 app:layout_constraintStart_toStartOf="parent"
@@ -62,10 +65,11 @@
                 <TextView
                     android:id="@+id/question_textview"
                     style="@style/StandardTextMediumStyle.White"
+                    android:text="@string/loading_question"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:padding="@dimen/question_text_padding"
-                    android:text="@string/loading_question" />
+                    android:layout_marginTop="16dp"
+                    android:padding="@dimen/question_text_padding" />
             </androidx.cardview.widget.CardView>
 
             <androidx.recyclerview.widget.RecyclerView
