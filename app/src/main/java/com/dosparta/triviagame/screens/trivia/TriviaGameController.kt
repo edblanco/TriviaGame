@@ -47,8 +47,6 @@ class TriviaGameController(controllerCompositionRoot: ControllerCompositionRoot)
         controllerCompositionRoot.getFetchTriviaQuestionsUseCase()
     private val screensNavigator = controllerCompositionRoot.getScreensNavigator()
     private val dialogsManager = controllerCompositionRoot.getDialogManager()
-    private val overlayMessagesHelper =
-        controllerCompositionRoot.getMessagesDisplayer() // todo no need to show snack bars anymore
     private val activityUtils = controllerCompositionRoot.getActivityUtils()
     private val dialogsEventBus = controllerCompositionRoot.getDialogsEventBus()
 
@@ -174,7 +172,6 @@ class TriviaGameController(controllerCompositionRoot: ControllerCompositionRoot)
     private fun moveToNextQuestion() {
         screenState = ScreenState.IDLE
         if (currentQuestion == (questions.size - 1)) {
-            overlayMessagesHelper.showGameOverOverlay(correctAnswers, questions.size)
             showResults()
             return
         }

@@ -18,7 +18,6 @@ class DialogsManager(private val context: Context, private val fragmentManager: 
         dialogFragment.show(fragmentManager, tag)
     }
 
-    // TODO remove status code from ui messages
     fun showErrorUseCaseDialog(
         messageResourceID: Int,
         tag: String?,
