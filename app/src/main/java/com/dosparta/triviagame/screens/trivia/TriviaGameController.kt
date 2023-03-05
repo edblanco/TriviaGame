@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.util.Log
 import com.android.volley.*
 import com.dosparta.triviagame.R
-import com.dosparta.triviagame.common.Utils
 import com.dosparta.triviagame.common.dependencyinjection.ControllerCompositionRoot
 import com.dosparta.triviagame.questions.Answer
 import com.dosparta.triviagame.questions.FetchTriviaQuestionsUseCase
@@ -102,17 +101,13 @@ class TriviaGameController(controllerCompositionRoot: ControllerCompositionRoot)
     }
 
     // todo On retry it should not ask the amount of questions again
-    override fun onTriviaQuestionsFetchFailed(error: VolleyError?) {
-        Log.i(tag, "Unable to retrieve data: ${error?.networkResponse}")
+    override fun onTriviaQuestionsFetchFailed(error: Exception?) {
         val message = getMessageFromError(error)
-        showErrorDialog(
-            if (error?.networkResponse != null) error.networkResponse.statusCode else Utils.INTERNAL_SERVER_ERROR,
-            message
-        )
+        showErrorDialog(message)
     }
 
-    private fun getMessageFromError(volleyError: VolleyError?): Int {
-        return when (volleyError) {
+    private fun getMessageFromError(error: Exception?): Int {
+        return when (error) {
             is NoConnectionError, is AuthFailureError, is NetworkError -> {
                 R.string.no_internet_connection_error_msg
             }
@@ -135,8 +130,8 @@ class TriviaGameController(controllerCompositionRoot: ControllerCompositionRoot)
         _viewMvc = viewMvc
     }
 
-    private fun showErrorDialog(statusCode: Int, message: Int) {
-        dialogsManager.showErrorUseCaseDialog(statusCode, message, SHOW_ERROR_DIALOG_TAG, false)
+    private fun showErrorDialog(message: Int) {
+        dialogsManager.showErrorUseCaseDialog(message, SHOW_ERROR_DIALOG_TAG, false)
     }
 
     override fun onAnswerClicked(answer: Answer, answersViewMvc: IAnswersItemViewMvc) {

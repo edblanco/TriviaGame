@@ -2,7 +2,7 @@ package com.dosparta.triviagame.questions
 
 import android.text.Html
 import android.util.Log
-import com.android.volley.*
+import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.dosparta.triviagame.common.BaseObservable
 import com.dosparta.triviagame.common.Utils
@@ -12,30 +12,33 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 
-class FetchTriviaQuestionsUseCase(private val volleyInstance: VolleySingleton): BaseObservable<FetchTriviaQuestionsUseCase.Listener>() {
+class FetchTriviaQuestionsUseCase(private val volleyInstance: VolleySingleton) :
+    BaseObservable<FetchTriviaQuestionsUseCase.Listener>() {
 
     interface Listener {
         fun onTriviaQuestionsFetched(questions: List<Question>)
-        fun onTriviaQuestionsFetchFailed(error: VolleyError?) //todo re-work error. Activity should not know how questions are fetched
+        fun onTriviaQuestionsFetchFailed(error: Exception?) //todo re-work error. Activity should not know how questions are fetched
     }
 
     fun fetchTriviaQuestionsAndNotify(questionsAmount: String) {
-        val stringRequest = StringRequest(Request.Method.GET, Utils.TRIVIA_API_URL + questionsAmount, { response ->
-            notifySuccess(parseResponse(response))
-        }, {
-            notifyFailure(it)
-        })
+        val stringRequest =
+            StringRequest(Request.Method.GET, Utils.TRIVIA_API_URL + questionsAmount, { response ->
+                notifySuccess(parseResponse(response))
+            }, {
+                Log.i(TAG, "fetchTriviaQuestionsAndNotify (network error): ${it.networkResponse}")
+                notifyFailure(it)
+            })
         volleyInstance.addToRequestQueue(stringRequest)
     }
 
     private fun notifySuccess(questions: List<Question>) {
-        for(listener in listeners) {
+        for (listener in listeners) {
             listener.onTriviaQuestionsFetched(questions)
         }
     }
 
-    private fun notifyFailure(error: VolleyError?) {
-        for(listener in listeners) {
+    private fun notifyFailure(error: Exception?) {
+        for (listener in listeners) {
             listener.onTriviaQuestionsFetchFailed(error)
         }
     }
@@ -46,13 +49,24 @@ class FetchTriviaQuestionsUseCase(private val volleyInstance: VolleySingleton): 
         return questionsSchemaToQuestions(jsonData)
     }
 
-    private fun questionsSchemaToQuestions(questionsSchema: QuestionsSchema) : List<Question>
-    {
-        val questionList :MutableList<Question> = mutableListOf()
+    private fun questionsSchemaToQuestions(questionsSchema: QuestionsSchema): List<Question> {
+        val questionList: MutableList<Question> = mutableListOf()
         for (result in questionsSchema.results) {
-            val answers :MutableList<Answer> = mutableListOf(Answer(Html.fromHtml(result.correct_answer, Html.FROM_HTML_MODE_COMPACT).toString(), true))
-            for (incorrectAnswer in result.incorrect_answers){
-                answers.add(Answer(Html.fromHtml(incorrectAnswer, Html.FROM_HTML_MODE_COMPACT).toString(), false))
+            val answers: MutableList<Answer> = mutableListOf(
+                Answer(
+                    Html.fromHtml(
+                        result.correct_answer,
+                        Html.FROM_HTML_MODE_COMPACT
+                    ).toString(), true
+                )
+            )
+            for (incorrectAnswer in result.incorrect_answers) {
+                answers.add(
+                    Answer(
+                        Html.fromHtml(incorrectAnswer, Html.FROM_HTML_MODE_COMPACT).toString(),
+                        false
+                    )
+                )
             }
 
             val question = Question(

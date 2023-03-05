@@ -9,7 +9,7 @@
     <string name="incorrect">Incorrect</string>
     <string name="loading_question">loading…</string>
     <string name="out_of_text_placeholders">Question: %d/%d</string>
-    <string name="network_error_popup_title">Network error! (%d)</string>
+    <string name="network_error_popup_title">Network error</string>
     <string name="network_error_popup_msg">A network error occurred.
         \nDo you want to retry or close the App</string>
     <string name="network_error_popup_positive_msg">Retry</string>
