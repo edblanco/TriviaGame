@@ -40,7 +40,7 @@ class TriviaGameController(
         private const val SHOW_ERROR_DIALOG_TAG = "SHOW_ERROR_DIALOG_TAG"
     }
     private enum class ScreenState {
-        IDLE, INITIAL_SETUP_SHOWN
+        IDLE, INITIAL_SETUP_SHOWN, ANSWER_SELECTED
     }
 
     private var questions: List<Question> = listOf()
@@ -136,6 +136,18 @@ class TriviaGameController(
     }
 
     override fun onAnswerClicked(answer: Answer, answersViewMvc: IAnswersItemViewMvc) {
+        if (screenState == ScreenState.ANSWER_SELECTED) {
+            Log.i(tag, "onAnswerClicked: screen state is $screenState")
+            return
+        }
+        screenState = ScreenState.ANSWER_SELECTED
+        handleSelectedAnswer(answer, answersViewMvc)
+    }
+
+    private fun handleSelectedAnswer(
+        answer: Answer,
+        answersViewMvc: IAnswersItemViewMvc
+    ) {
         val isCorrect = answer.correct
         answersViewMvc.updateTintColor(answer.correct)
 
@@ -160,11 +172,8 @@ class TriviaGameController(
         moveToNextQuestion()
     }
 
-    override fun onCorrectAnswerFound(answersItemViewMvc: IAnswersItemViewMvc) {
-        answersItemViewMvc.updateTintColor(true)
-    }
-
     private fun moveToNextQuestion() {
+        screenState = ScreenState.IDLE
         if (currentQuestion == (questions.size - 1)) {
             overlayMessagesHelper.showGameOverOverlay(correctAnswers, questions.size)
             showResults()
@@ -186,6 +195,10 @@ class TriviaGameController(
         currentQuestion = 0
         viewMvc.showButtonNext(false)
         viewMvc.bindQuestions(currentQuestion, questions)
+    }
+
+    override fun onCorrectAnswerFound(answersItemViewMvc: IAnswersItemViewMvc) {
+        answersItemViewMvc.updateTintColor(true)
     }
 
     override fun onDialogEvent(event: Any) {
