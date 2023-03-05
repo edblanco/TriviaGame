@@ -37,7 +37,7 @@ class ControllerCompositionRoot(private val compositionRoot: CompositionRoot, pr
     }
 
     fun getTriviaGameController(): ITriviaGameController {
-        // todo: move screen navigator and MessagesDisplayer to ActivityUtils ... Pass controller composition root
+        // TODO: move screen navigator and MessagesDisplayer to ActivityUtils ... Pass controller composition root
         return TriviaGameController(getFetchTriviaQuestionsUseCase(), getScreensNavigator(), getDialogManager(), getMessagesDisplayer(), getActivityUtils(), getDialogsEventBus())
     }
 

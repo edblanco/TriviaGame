@@ -65,23 +65,27 @@ class DialogsManager(private val context: Context, private val fragmentManager: 
             .show()
     }
 
-    fun showQuestionsAmountUseCaseDialog(tag: String?){
+    fun showQuestionsAmountUseCaseDialog(tag: String?, isCancellable: Boolean = true){
         val dialogFragment = QuestionsDialog.newQuestionsDialog()
+        dialogFragment.isCancelable = isCancellable
         dialogFragment.show(fragmentManager, tag)
     }
 
-    fun showErrorUseCaseDialog(statusCode: Int, messageResourceID: Int, tag: String?) {
+    // TODO remove status code from ui messages
+    fun showErrorUseCaseDialog(statusCode: Int, messageResourceID: Int, tag: String?, isCancellable: Boolean = true) {
         val title = context.getString(R.string.network_error_popup_title, statusCode)
         val messageText = context.getString(messageResourceID)
         val captionOKText = context.getString(R.string.network_error_popup_positive_msg)
         val captionNOKText = context.getString(R.string.network_error_popup_negative_msg)
         val dialogFragment = PromptDialog.newPromptDialog(title, messageText, captionOKText, captionNOKText)
+        dialogFragment.isCancelable = isCancellable
         dialogFragment.show(fragmentManager, tag)
     }
 
-    fun showResultsUseCaseDialog(correctAnswers: Int, totalAnswers: Int, tag: String?) {
+    fun showResultsUseCaseDialog(correctAnswers: Int, totalAnswers: Int, tag: String?, isCancellable: Boolean = true) {
         val correctAnswersOverTotal = (correctAnswers * HUNDRED_PERCENT) / totalAnswers
         val dialogFragment = PromptDialog.newPromptDialog(context.getString(R.string.game_over_popup_title), context.getString(R.string.game_over_popup_msg, correctAnswers, totalAnswers, correctAnswersOverTotal), context.getString(R.string.game_over_popup_positive_msg), context.getString(R.string.game_over_popup_negative_msg))
+        dialogFragment.isCancelable = isCancellable
         dialogFragment.show(fragmentManager, tag)
     }
 

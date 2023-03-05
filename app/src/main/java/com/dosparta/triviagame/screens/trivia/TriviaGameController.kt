@@ -9,11 +9,10 @@ import com.dosparta.triviagame.questions.Answer
 import com.dosparta.triviagame.questions.FetchTriviaQuestionsUseCase
 import com.dosparta.triviagame.questions.Question
 import com.dosparta.triviagame.screens.common.ActivityUtils
-import com.dosparta.triviagame.screens.common.dialogs.DialogsManager
 import com.dosparta.triviagame.screens.common.dialogs.DialogsEventBus
+import com.dosparta.triviagame.screens.common.dialogs.DialogsManager
 import com.dosparta.triviagame.screens.common.dialogs.promptdialog.PromptDialogEvent
 import com.dosparta.triviagame.screens.common.dialogs.questionsdialog.QuestionsDialogEvent
-import com.dosparta.triviagame.screens.common.popups.AlertDialogListener
 import com.dosparta.triviagame.screens.common.popups.OverlayMessagesHelper
 import com.dosparta.triviagame.screens.common.screensnavigator.ScreensNavigator
 import com.dosparta.triviagame.screens.trivia.answersitem.IAnswersItemViewMvc
@@ -91,7 +90,7 @@ class TriviaGameController(
     private fun fetchQuestionsSetup() {
         if (screenState == ScreenState.IDLE) {
             screenState = ScreenState.INITIAL_SETUP_SHOWN
-            dialogsManager.showQuestionsAmountUseCaseDialog(INITIAL_SETUP_DIALOG_TAG)
+            dialogsManager.showQuestionsAmountUseCaseDialog(INITIAL_SETUP_DIALOG_TAG, false)
         }
     }
 
@@ -133,7 +132,7 @@ class TriviaGameController(
     }
 
     private fun showErrorDialog(statusCode: Int, message: Int) {
-        dialogsManager.showErrorUseCaseDialog(statusCode, message, SHOW_ERROR_DIALOG_TAG)
+        dialogsManager.showErrorUseCaseDialog(statusCode, message, SHOW_ERROR_DIALOG_TAG, false)
     }
 
     override fun onAnswerClicked(answer: Answer, answersViewMvc: IAnswersItemViewMvc) {
@@ -178,7 +177,7 @@ class TriviaGameController(
 
     private fun showResults() {
         dialogsManager.showResultsUseCaseDialog(correctAnswers, questions.size,
-            SHOW_RESULTS_DIALOG_TAG
+            SHOW_RESULTS_DIALOG_TAG, false
         )
     }
 
