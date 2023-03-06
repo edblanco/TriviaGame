@@ -1,6 +1,8 @@
 package com.dosparta.triviagame.screens.common.dialogs.questionsdialog
 
 import android.app.Dialog
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Button
@@ -46,6 +48,8 @@ class QuestionsDialog: BaseDialog() {
         }
 
         btnContinue.setOnClickListener { onContinueButtonClicked() }
+
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         return dialog
     }
