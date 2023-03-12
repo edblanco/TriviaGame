@@ -3,6 +3,7 @@ package com.dosparta.triviagame.common.dependencyinjection
 import android.view.LayoutInflater
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
+import com.dosparta.triviagame.networking.IVolleySingleton
 import com.dosparta.triviagame.networking.VolleySingleton
 import com.dosparta.triviagame.questions.FetchTriviaQuestionsUseCase
 import com.dosparta.triviagame.screens.common.ActivityUtils
@@ -19,7 +20,7 @@ class ControllerCompositionRoot(
     private val activity: FragmentActivity
 ) {
 
-    private fun getVolleyInstance(): VolleySingleton {
+    private fun getVolleyInstance(): IVolleySingleton {
         return compositionRoot.getVolleyInstance(activity)
     }
 

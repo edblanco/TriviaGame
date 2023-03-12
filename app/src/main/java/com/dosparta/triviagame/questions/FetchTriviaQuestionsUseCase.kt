@@ -6,13 +6,14 @@ import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.dosparta.triviagame.common.BaseObservable
 import com.dosparta.triviagame.common.Utils
+import com.dosparta.triviagame.networking.IVolleySingleton
 import com.dosparta.triviagame.networking.VolleySingleton
 import com.dosparta.triviagame.networking.schemas.QuestionsSchema
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 
-class FetchTriviaQuestionsUseCase(private val volleyInstance: VolleySingleton) :
+class FetchTriviaQuestionsUseCase(private val volleyInstance: IVolleySingleton) :
     BaseObservable<FetchTriviaQuestionsUseCase.Listener>() {
 
     interface Listener {
