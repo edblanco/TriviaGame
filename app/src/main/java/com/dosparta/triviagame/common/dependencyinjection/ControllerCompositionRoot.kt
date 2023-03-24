@@ -3,8 +3,7 @@ package com.dosparta.triviagame.common.dependencyinjection
 import android.view.LayoutInflater
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
-import com.dosparta.triviagame.networking.IVolleySingleton
-import com.dosparta.triviagame.networking.VolleySingleton
+import com.dosparta.triviagame.networking.*
 import com.dosparta.triviagame.questions.FetchTriviaQuestionsUseCase
 import com.dosparta.triviagame.screens.common.ActivityUtils
 import com.dosparta.triviagame.screens.common.ViewMvcFactory
@@ -37,7 +36,15 @@ class ControllerCompositionRoot(
     }
 
     fun getFetchTriviaQuestionsUseCase(): FetchTriviaQuestionsUseCase {
-        return FetchTriviaQuestionsUseCase(getVolleyInstance())
+        return FetchTriviaQuestionsUseCase(getVolleyInstance(), getTriviaApiEndpoints())
+    }
+
+    private fun getTriviaApiEndpoints(): ITriviaApiEndpoints {
+        return TriviaApiEndpoints(getTriviaApiProperties())
+    }
+
+    private fun getTriviaApiProperties(): ITriviaApiProperties {
+        return TriviaApiProperties(activity)
     }
 
     fun getTriviaGameController(): ITriviaGameController {

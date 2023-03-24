@@ -5,15 +5,17 @@ import android.util.Log
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.dosparta.triviagame.common.BaseObservable
-import com.dosparta.triviagame.common.Utils
+import com.dosparta.triviagame.networking.ITriviaApiEndpoints
 import com.dosparta.triviagame.networking.IVolleySingleton
-import com.dosparta.triviagame.networking.VolleySingleton
 import com.dosparta.triviagame.networking.schemas.QuestionsSchema
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 
-class FetchTriviaQuestionsUseCase(private val volleyInstance: IVolleySingleton) :
+class FetchTriviaQuestionsUseCase(
+    private val volleyInstance: IVolleySingleton,
+    private val triviaApiEndpoints: ITriviaApiEndpoints
+) :
     BaseObservable<FetchTriviaQuestionsUseCase.Listener>() {
 
     interface Listener {
@@ -21,15 +23,19 @@ class FetchTriviaQuestionsUseCase(private val volleyInstance: IVolleySingleton) 
         fun onTriviaQuestionsFetchFailed(error: Exception?)
     }
 
+
     fun fetchTriviaQuestionsAndNotify(questionsAmount: String) {
-        val stringRequest =
-            StringRequest(Request.Method.GET, Utils.TRIVIA_API_URL + questionsAmount, { response ->
-                notifySuccess(parseResponse(response))
-            }, {
-                Log.i(TAG, "fetchTriviaQuestionsAndNotify (network error): ${it.networkResponse}")
-                notifyFailure(it)
-            })
-        volleyInstance.addToRequestQueue(stringRequest)
+        val questionsEndpoint = triviaApiEndpoints.getQuestionsEndpoint(questionsAmount).toString()
+        volleyInstance.addToRequestQueue(getStringRequest(Request.Method.GET, questionsEndpoint))
+    }
+
+    private fun getStringRequest(requestMethod: Int, url: String): StringRequest {
+        return StringRequest(requestMethod, url, { response ->
+            notifySuccess(parseResponse(response))
+        }, {
+            Log.i(TAG, "fetchTriviaQuestionsAndNotify (network error): ${it.networkResponse}")
+            notifyFailure(it)
+        })
     }
 
     private fun notifySuccess(questions: List<Question>) {
