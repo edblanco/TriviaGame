@@ -2,11 +2,14 @@ package com.dosparta.triviagame.networking
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.util.Log
 import android.util.LruCache
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.ImageLoader
+import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
+import com.dosparta.triviagame.questions.FetchTriviaQuestionsUseCase
 
 class VolleySingleton constructor(context: Context) : IVolleySingleton {
     val imageLoader: ImageLoader by lazy {
@@ -28,5 +31,13 @@ class VolleySingleton constructor(context: Context) : IVolleySingleton {
     }
     override fun <T> addToRequestQueue(req: Request<T>) {
         requestQueue.add(req)
+    }
+
+    override fun createStringRequest(requestMethod: Int, url: String, listener: IVolleySingleton.Listener): StringRequest? {
+        return StringRequest(requestMethod, url, { response ->
+            listener.notifySuccess(response)
+        }, {
+            listener.notifyFailure(it)
+        })
     }
 }
