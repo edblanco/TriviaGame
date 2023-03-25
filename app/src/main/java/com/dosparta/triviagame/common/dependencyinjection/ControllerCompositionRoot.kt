@@ -36,7 +36,11 @@ class ControllerCompositionRoot(
     }
 
     fun getFetchTriviaQuestionsUseCase(): FetchTriviaQuestionsUseCase {
-        return FetchTriviaQuestionsUseCase(getVolleyInstance(), getTriviaApiEndpoints())
+        return FetchTriviaQuestionsUseCase(getVolleyInstance(), getTriviaApiEndpoints(), getQuestionsSchemaParser())
+    }
+
+    private fun getQuestionsSchemaParser(): IQuestionsSchemaParser {
+        return QuestionsSchemaParser()
     }
 
     private fun getTriviaApiEndpoints(): ITriviaApiEndpoints {
