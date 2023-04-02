@@ -9,6 +9,5 @@ interface IVolleySingleton {
         fun notifySuccess(response: String)
         fun notifyFailure(error: Exception?)
     }
-    fun <T> addToRequestQueue(req: Request<T>)
-    fun createStringRequest(requestMethod: Int, url: String, listener: Listener): StringRequest?
+    fun addStringRequestToQueue(requestMethod: Int, url: String, listener: Listener)
 }
