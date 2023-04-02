@@ -66,7 +66,7 @@ internal class FetchTriviaQuestionsUseCaseTest {
         SUT.registerListener(listener)
         volleySingletonTd.callNotifySuccess = true
         volleySingletonTd.response = "wrong response"
-        volleySingletonTd.createStringRequest(Request.Method.GET, TRIVIA_API_URL, SUT)
+        SUT.fetchTriviaQuestionsAndNotify(QUESTIONS_AMOUNT)
 
         assertTrue(listener.onTriviaQuestionsFetchFailed)
         assertFalse(listener.onTriviaQuestionsFetched)
@@ -78,7 +78,7 @@ internal class FetchTriviaQuestionsUseCaseTest {
         SUT.registerListener(listener)
         volleySingletonTd.callNotifySuccess = true
         volleySingletonTd.response = RESPONSE
-        volleySingletonTd.createStringRequest(Request.Method.GET, TRIVIA_API_URL, SUT)
+        SUT.fetchTriviaQuestionsAndNotify(QUESTIONS_AMOUNT)
 
         assertTrue(listener.onTriviaQuestionsFetched)
         assertFalse(listener.onTriviaQuestionsFetchFailed)
@@ -89,7 +89,7 @@ internal class FetchTriviaQuestionsUseCaseTest {
     internal fun onTriviaQuestionsFetchFailed_failure_notifyError() {
         SUT.registerListener(listener)
         volleySingletonTd.callNotifyError = true
-        volleySingletonTd.createStringRequest(Request.Method.GET, TRIVIA_API_URL, SUT)
+        SUT.fetchTriviaQuestionsAndNotify(QUESTIONS_AMOUNT)
 
         assertTrue(listener.onTriviaQuestionsFetchFailed)
         assertFalse(listener.onTriviaQuestionsFetched)
@@ -103,7 +103,7 @@ internal class FetchTriviaQuestionsUseCaseTest {
         volleySingletonTd.callNotifySuccess = true
         volleySingletonTd.callNotifyError = true
         volleySingletonTd.response = RESPONSE
-        volleySingletonTd.createStringRequest(Request.Method.GET, TRIVIA_API_URL, SUT)
+        SUT.fetchTriviaQuestionsAndNotify(QUESTIONS_AMOUNT)
 
         assertTrue(listener.onTriviaQuestionsFetched)
         assertTrue(listener2.onTriviaQuestionsFetched)
@@ -118,30 +118,23 @@ internal class FetchTriviaQuestionsUseCaseTest {
         var callNotifySuccess = false
         var callNotifyError = false
         var response = ""
-
-        override fun <T> addToRequestQueue(req: Request<T>) {
-            url = req.url
-            //val url = Uri.parse(req.url)
-            //questionsAmount = url.getQueryParameter("amount") ?: ""
-        }
-
-        override fun createStringRequest(
+        override fun addStringRequestToQueue(
             requestMethod: Int,
             url: String,
             listener: IVolleySingleton.Listener
-        ): StringRequest? {
-            val uri = URI(url)
+        ) {
             this.url = url
+            val uri = URI(url)
+
             questionsAmount = uri.findParameterValue("amount") ?: ""
+
             if (callNotifySuccess) {
                 listener.notifySuccess(response)
             }
             if (callNotifyError) {
                 listener.notifyFailure(java.lang.Exception())
             }
-            return null
         }
-
     }
 
     private class TriviaApiEndpointsTd : ITriviaApiEndpoints {
