@@ -1,7 +1,6 @@
 package com.dosparta.triviagame.questions
 
 import com.android.volley.Request
-import com.android.volley.toolbox.StringRequest
 import com.dosparta.triviagame.common.BaseObservable
 import com.dosparta.triviagame.networking.IQuestionsSchemaParser
 import com.dosparta.triviagame.networking.ITriviaApiEndpoints
@@ -23,20 +22,11 @@ class FetchTriviaQuestionsUseCase(
         fun onTriviaQuestionsFetchFailed(error: Exception?)
     }
 
-    //todo: all volley dependencies should be removed from this class
+    //todo: test it against config changed
     fun fetchTriviaQuestionsAndNotify(questionsAmount: String) {
         val questionsEndpoint = triviaApiEndpoints.getQuestionsEndpoint(questionsAmount)
-        val volleyRequest = getStringRequest(Request.Method.GET, questionsEndpoint)
-        volleyRequest?.let {
-            volleyInstance.addToRequestQueue(it)
-        }
+        volleyInstance.addStringRequestToQueue(Request.Method.GET, questionsEndpoint, this)
     }
-
-    // todo: move this stringRequest to volley class
-    private fun getStringRequest(requestMethod: Int, url: String): StringRequest? {
-        return volleyInstance.createStringRequest(requestMethod, url, this)
-    }
-
 
     override fun notifySuccess(response: String) {
         try {
