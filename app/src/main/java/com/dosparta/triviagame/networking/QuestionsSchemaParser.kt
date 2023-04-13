@@ -1,12 +1,13 @@
 package com.dosparta.triviagame.networking
 
 import android.text.Html
+import com.dosparta.triviagame.networking.parsers.IHtmlParser
 import com.dosparta.triviagame.networking.schemas.QuestionsSchema
 import com.dosparta.triviagame.networking.schemas.Result
 import com.dosparta.triviagame.questions.Answer
 import com.dosparta.triviagame.questions.Question
 
-class QuestionsSchemaParser : IQuestionsSchemaParser {
+class QuestionsSchemaParser(private val htmlParser: IHtmlParser) : IQuestionsSchemaParser {
 
     override fun questionsSchemaToQuestions(questionsSchema: QuestionsSchema): List<Question> {
         val questionList: MutableList<Question> = mutableListOf()
@@ -18,28 +19,23 @@ class QuestionsSchemaParser : IQuestionsSchemaParser {
     }
 
     private fun getAnswers(result: Result): List<Answer> {
+        val correctAnswer = htmlParser.fromHtml(result.correct_answer, Html.FROM_HTML_MODE_COMPACT)
         val answers: MutableList<Answer> = mutableListOf(
-            Answer(
-                Html.fromHtml(
-                    result.correct_answer,
-                    Html.FROM_HTML_MODE_COMPACT
-                ).toString(), true
-            )
+            Answer(correctAnswer, true)
         )
         for (incorrectAnswer in result.incorrect_answers) {
+            val schemaAnswer = htmlParser.fromHtml(incorrectAnswer, Html.FROM_HTML_MODE_COMPACT)
             answers.add(
-                Answer(
-                    Html.fromHtml(incorrectAnswer, Html.FROM_HTML_MODE_COMPACT).toString(),
-                    false
-                )
+                Answer(schemaAnswer, false)
             )
         }
         return answers
     }
 
     private fun getQuestion(result: Result, answers: List<Answer>): Question {
+        val question = htmlParser.fromHtml(result.question, Html.FROM_HTML_MODE_COMPACT)
         return Question(
-            question = Html.fromHtml(result.question, Html.FROM_HTML_MODE_COMPACT).toString(),
+            question = question,
             difficulty = result.difficulty,
             category = result.category,
             type = result.type,

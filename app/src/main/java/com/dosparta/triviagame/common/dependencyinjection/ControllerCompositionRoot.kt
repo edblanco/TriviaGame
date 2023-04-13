@@ -4,6 +4,8 @@ import android.view.LayoutInflater
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import com.dosparta.triviagame.networking.*
+import com.dosparta.triviagame.networking.parsers.HtmlParser
+import com.dosparta.triviagame.networking.parsers.IHtmlParser
 import com.dosparta.triviagame.questions.FetchTriviaQuestionsUseCase
 import com.dosparta.triviagame.screens.common.ActivityUtils
 import com.dosparta.triviagame.screens.common.ViewMvcFactory
@@ -40,7 +42,11 @@ class ControllerCompositionRoot(
     }
 
     private fun getQuestionsSchemaParser(): IQuestionsSchemaParser {
-        return QuestionsSchemaParser()
+        return QuestionsSchemaParser(getHtmlParser())
+    }
+
+    private fun getHtmlParser(): IHtmlParser {
+        return HtmlParser()
     }
 
     private fun getTriviaApiEndpoints(): ITriviaApiEndpoints {
