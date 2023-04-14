@@ -7,7 +7,7 @@ import com.dosparta.triviagame.R
 import com.dosparta.triviagame.questions.Answer
 import com.dosparta.triviagame.screens.common.views.BaseObservableViewMvc
 
-class AnswersItemViewMvc(layoutInflater: LayoutInflater, parent: ViewGroup?) : BaseObservableViewMvc<IAnswersItemViewMvc.Listener>(),
+class AnswersItemViewMvc(layoutInflater: LayoutInflater, parent: ViewGroup?, private val uiConfig: IUIAnswersItemConfig) : BaseObservableViewMvc<IAnswersItemViewMvc.Listener>(),
     IAnswersItemViewMvc {
 
     private val questionButton: Button
@@ -18,7 +18,7 @@ class AnswersItemViewMvc(layoutInflater: LayoutInflater, parent: ViewGroup?) : B
     }
 
     override fun updateTintColor(isCorrect: Boolean) {
-        val color = if (isCorrect) R.color.hunter_green else R.color.blood_red
+        val color = uiConfig.getAnswerTintColor(isCorrect)
         questionButton.backgroundTintList = getContext().resources.getColorStateList(color, null)
     }
 
