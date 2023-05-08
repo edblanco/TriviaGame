@@ -24,5 +24,8 @@ jobs:
       - name: Execute Gradle Lint
         run: ./gradlew lint
 
-      - name: Execute Gradle build
+      - name: Execute Gradle Test
+        run: ./gradlew test
+
+      - name: Execute Gradle Build
         run: ./gradlew build
