@@ -3,9 +3,14 @@ package com.dosparta.triviagame.common.dependencyinjection
 import android.view.LayoutInflater
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
+import com.dosparta.triviagame.categories.FetchTriviaCategoriesUseCase
 import com.dosparta.triviagame.networking.*
+import com.dosparta.triviagame.networking.parsers.CategoriesSchemaParser
 import com.dosparta.triviagame.networking.parsers.HtmlParser
+import com.dosparta.triviagame.networking.parsers.ICategoriesSchemaParser
 import com.dosparta.triviagame.networking.parsers.IHtmlParser
+import com.dosparta.triviagame.networking.parsers.IQuestionsSchemaParser
+import com.dosparta.triviagame.networking.parsers.QuestionsSchemaParser
 import com.dosparta.triviagame.questions.FetchTriviaQuestionsUseCase
 import com.dosparta.triviagame.screens.common.ActivityUtils
 import com.dosparta.triviagame.screens.common.ViewMvcFactory
@@ -39,6 +44,14 @@ class ControllerCompositionRoot(
 
     fun getFetchTriviaQuestionsUseCase(): FetchTriviaQuestionsUseCase {
         return FetchTriviaQuestionsUseCase(getVolleyInstance(), getTriviaApiEndpoints(), getQuestionsSchemaParser())
+    }
+
+    fun getFetchTriviaCategoriesUseCase(): FetchTriviaCategoriesUseCase {
+        return FetchTriviaCategoriesUseCase(getVolleyInstance(), getTriviaApiEndpoints(), getCategoriesSchemaParser())
+    }
+
+    private fun getCategoriesSchemaParser(): ICategoriesSchemaParser {
+        return CategoriesSchemaParser()
     }
 
     private fun getQuestionsSchemaParser(): IQuestionsSchemaParser {

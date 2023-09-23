@@ -1,6 +1,7 @@
 package com.dosparta.triviagame.networking
 
 import com.dosparta.triviagame.networking.parsers.HtmlParser
+import com.dosparta.triviagame.networking.parsers.QuestionsSchemaParser
 import com.dosparta.triviagame.networking.schemas.QuestionsSchema
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach

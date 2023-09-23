@@ -1,4 +1,4 @@
-package com.dosparta.triviagame.networking
+package com.dosparta.triviagame.networking.parsers
 
 import com.dosparta.triviagame.networking.schemas.QuestionsSchema
 import com.dosparta.triviagame.questions.Question

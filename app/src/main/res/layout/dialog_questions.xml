@@ -34,13 +34,40 @@
         android:layout_marginStart="16dp"
         />
 
+    <TextView
+        android:id="@+id/categories"
+        style="@style/StandardTextMediumStyle.White"
+        android:text="@string/select_questions_category"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/spinner_questions_amount"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        />
+
+    <Spinner
+        android:id="@+id/spinner_questions_categories"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:popupBackground="@color/main_background_color"
+        android:dropDownWidth="300dp"
+        android:backgroundTint="@color/button_text_color"
+        app:layout_constraintTop_toBottomOf="@id/categories"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        />
+
+
     <Button
         android:id="@+id/button_continue"
         style="@style/ButtonStyle"
         android:text="@string/continue_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/spinner_questions_amount"
+        app:layout_constraintTop_toBottomOf="@id/spinner_questions_categories"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"

@@ -4,18 +4,21 @@ import android.os.Bundle
 import android.util.Log
 import com.android.volley.*
 import com.dosparta.triviagame.R
+import com.dosparta.triviagame.categories.FetchTriviaCategoriesUseCase
+import com.dosparta.triviagame.categories.TriviaCategoryIn
 import com.dosparta.triviagame.common.dependencyinjection.ControllerCompositionRoot
 import com.dosparta.triviagame.questions.Answer
 import com.dosparta.triviagame.questions.FetchTriviaQuestionsUseCase
 import com.dosparta.triviagame.questions.Question
 import com.dosparta.triviagame.screens.common.dialogs.DialogsEventBus
 import com.dosparta.triviagame.screens.common.dialogs.promptdialog.PromptDialogEvent
+import com.dosparta.triviagame.screens.common.dialogs.questionsdialog.QuestionsDialog
 import com.dosparta.triviagame.screens.common.dialogs.questionsdialog.QuestionsDialogEvent
 import com.dosparta.triviagame.screens.trivia.answersitem.IAnswersItemViewMvc
 
 class TriviaGameController(controllerCompositionRoot: ControllerCompositionRoot) :
     ITriviaGameController, ITriviaGameViewMvc.Listener, FetchTriviaQuestionsUseCase.Listener,
-    DialogsEventBus.Listener {
+    DialogsEventBus.Listener, FetchTriviaCategoriesUseCase.Listener {
 
     companion object {
         private val tag = TriviaGameActivity::class.java.simpleName
@@ -39,12 +42,14 @@ class TriviaGameController(controllerCompositionRoot: ControllerCompositionRoot)
     private var correctAnswers: Int = 0
 
     private var _viewMvc: ITriviaGameViewMvc? = null
+    private var categories: List<TriviaCategoryIn> = listOf()
     private val viewMvc get() = _viewMvc!!
 
     private var screenState = ScreenState.IDLE
 
     private val fetchTriviaQuestionsUseCase =
         controllerCompositionRoot.getFetchTriviaQuestionsUseCase()
+    private val fetchTriviaCategoriesUseCase = controllerCompositionRoot.getFetchTriviaCategoriesUseCase()
     private val screensNavigator = controllerCompositionRoot.getScreensNavigator()
     private val dialogsManager = controllerCompositionRoot.getDialogManager()
     private val activityUtils = controllerCompositionRoot.getActivityUtils()
@@ -54,6 +59,9 @@ class TriviaGameController(controllerCompositionRoot: ControllerCompositionRoot)
         viewMvc.registerListener(this)
         fetchTriviaQuestionsUseCase.registerListener(this)
         dialogsEventBus.registerListener(this)
+        fetchTriviaCategoriesUseCase.registerListener(this)
+
+        fetchTriviaCategoriesUseCase.fetchTriviaCategoriesAndNotify()
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
@@ -88,7 +96,7 @@ class TriviaGameController(controllerCompositionRoot: ControllerCompositionRoot)
     private fun fetchQuestionsSetup() {
         if (screenState == ScreenState.IDLE) {
             screenState = ScreenState.INITIAL_SETUP_SHOWN
-            dialogsManager.showQuestionsAmountUseCaseDialog(INITIAL_SETUP_DIALOG_TAG, false)
+            dialogsManager.showQuestionsAmountUseCaseDialog(INITIAL_SETUP_DIALOG_TAG, categories, false)
         }
     }
 
@@ -211,8 +219,10 @@ class TriviaGameController(controllerCompositionRoot: ControllerCompositionRoot)
 
     private fun handleInitialSetupDialogEvent(event: Any) {
         screenState = ScreenState.IDLE
-        val questionsAmount = (event as QuestionsDialogEvent).getQuestionsAmount()
-        fetchTriviaQuestionsUseCase.fetchTriviaQuestionsAndNotify(questionsAmount)
+        val questionsDialogEvent = (event as QuestionsDialogEvent)
+        val questionsAmount = questionsDialogEvent.getQuestionsAmount()
+        val category = questionsDialogEvent.category
+        fetchTriviaQuestionsUseCase.fetchTriviaQuestionsAndNotify(questionsAmount, category.id)
     }
 
     private fun handleResultsDialogEvent(event: Any) {
@@ -241,5 +251,18 @@ class TriviaGameController(controllerCompositionRoot: ControllerCompositionRoot)
                 }
             }
         }
+    }
+
+    override fun onTriviaCategoriesFetched(categories: List<TriviaCategoryIn>) {
+        this.categories = categories
+        val dialog = dialogsManager.getFragmentDialog(INITIAL_SETUP_DIALOG_TAG)
+        dialog?.let {
+            (dialog as? QuestionsDialog)?.updateCategories(categories)
+        }
+    }
+
+    override fun onTriviaCategoriesFetchFailed() {
+        Log.i(tag, "onTriviaCategoriesFetchFailed: ")
+        categories = listOf()
     }
 }

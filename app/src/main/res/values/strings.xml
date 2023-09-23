@@ -29,5 +29,6 @@
     <string name="no_internet_connection_error_msg">Cannot connect to Internet...Please check your connection and try again.</string>
     <string name="select_questions_amount">Select amount of questions</string>
     <string name="continue_btn">Continue</string>
+    <string name="select_questions_category">Select Category</string>
 
 </resources>
