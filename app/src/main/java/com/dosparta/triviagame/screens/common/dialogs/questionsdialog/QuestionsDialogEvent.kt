@@ -1,8 +1,11 @@
 package com.dosparta.triviagame.screens.common.dialogs.questionsdialog
 
-class QuestionsDialogEvent(private val questionsAmount: String) {
+import com.dosparta.triviagame.categories.TriviaCategoryIn
+
+class QuestionsDialogEvent(private val questionsAmount: String, val category: TriviaCategoryIn) {
 
     fun getQuestionsAmount(): String {
         return questionsAmount
     }
+
 }

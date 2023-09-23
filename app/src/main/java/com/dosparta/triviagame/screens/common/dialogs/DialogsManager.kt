@@ -1,8 +1,10 @@
 package com.dosparta.triviagame.screens.common.dialogs
 
 import android.content.Context
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import com.dosparta.triviagame.R
+import com.dosparta.triviagame.categories.TriviaCategoryIn
 import com.dosparta.triviagame.screens.common.dialogs.promptdialog.PromptDialog
 import com.dosparta.triviagame.screens.common.dialogs.questionsdialog.QuestionsDialog
 
@@ -12,8 +14,12 @@ class DialogsManager(private val context: Context, private val fragmentManager: 
         private const val HUNDRED_PERCENT = 100
     }
 
-    fun showQuestionsAmountUseCaseDialog(tag: String?, isCancellable: Boolean = true) {
-        val dialogFragment = QuestionsDialog.newQuestionsDialog()
+    fun showQuestionsAmountUseCaseDialog(
+        tag: String?,
+        categories: List<TriviaCategoryIn>,
+        isCancellable: Boolean = true
+    ) {
+        val dialogFragment = QuestionsDialog.newQuestionsDialog(categories)
         dialogFragment.isCancelable = isCancellable
         dialogFragment.show(fragmentManager, tag)
     }
@@ -59,6 +65,15 @@ class DialogsManager(private val context: Context, private val fragmentManager: 
         for (fragment in fragmentManager.fragments) {
             if (fragment is BaseDialog) {
                 return fragment.tag
+            }
+        }
+        return null
+    }
+
+    fun getFragmentDialog(tag: String): Fragment? {
+        for (fragment in fragmentManager.fragments) {
+            if (fragment.tag == tag) {
+                return fragment
             }
         }
         return null

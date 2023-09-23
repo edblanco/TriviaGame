@@ -1,7 +1,6 @@
-package com.dosparta.triviagame.networking
+package com.dosparta.triviagame.networking.parsers
 
 import android.text.Html
-import com.dosparta.triviagame.networking.parsers.IHtmlParser
 import com.dosparta.triviagame.networking.schemas.QuestionsSchema
 import com.dosparta.triviagame.networking.schemas.Result
 import com.dosparta.triviagame.questions.Answer

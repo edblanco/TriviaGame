@@ -1,8 +1,7 @@
 package com.dosparta.triviagame.questions
 
-import com.android.volley.Request
-import com.android.volley.toolbox.StringRequest
-import com.dosparta.triviagame.networking.IQuestionsSchemaParser
+import com.dosparta.triviagame.categories.NO_CATEGORY_ID
+import com.dosparta.triviagame.networking.parsers.IQuestionsSchemaParser
 import com.dosparta.triviagame.networking.ITriviaApiEndpoints
 import com.dosparta.triviagame.networking.IVolleySingleton
 import com.dosparta.triviagame.networking.schemas.QuestionsSchema
@@ -16,6 +15,7 @@ internal class FetchTriviaQuestionsUseCaseTest {
     companion object {
         const val TRIVIA_API_URL = "https://opentdb.com/api.php?amount="
         const val QUESTIONS_AMOUNT = "10"
+        const val CATEGORY_ID = 10
         const val RESPONSE =
             "{\"response_code\":0,\"results\":[{\"category\":\"Entertainment: Video Games\",\"type\":\"multiple\",\"difficulty\":\"medium\",\"question\":\"What was the character Kirby originally going to be named?\",\"correct_answer\":\"Popopo\",\"incorrect_answers\":[\"Dedede\",\"Waddle Dee\",\"Prince Puff\"]},{\"category\":\"Art\",\"type\":\"boolean\",\"difficulty\":\"easy\",\"question\":\"Leonardo da Vinci&#039;s Mona Lisa does not have eyebrows.\",\"correct_answer\":\"True\",\"incorrect_answers\":[\"False\"]},{\"category\":\"Entertainment: Video Games\",\"type\":\"multiple\",\"difficulty\":\"medium\",\"question\":\"Which was the first video game to be produced by development company Rare?\",\"correct_answer\":\"Slalom\",\"incorrect_answers\":[\"R.C. Pro-Am\",\"Donkey Kong Country\",\"Battletoads\"]},{\"category\":\"Entertainment: Video Games\",\"type\":\"multiple\",\"difficulty\":\"easy\",\"question\":\"Which of the following was NOT a playable character in the game Kingdom Hearts: Birth by Sleep?\",\"correct_answer\":\"Ignis\",\"incorrect_answers\":[\"Ventus\",\"Terra\",\"Aqua\"]},{\"category\":\"Animals\",\"type\":\"multiple\",\"difficulty\":\"medium\",\"question\":\"What is the common term for bovine spongiform encephalopathy (BSE)?\",\"correct_answer\":\"Mad Cow disease\",\"incorrect_answers\":[\"Weil&#039;s disease\",\"Milk fever\",\"Foot-and-mouth disease\"]}]}"
     }
@@ -44,7 +44,7 @@ internal class FetchTriviaQuestionsUseCaseTest {
     // same amount is passed to volley request
     @Test
     internal fun fetchTriviaQuestionsAndNotify_questionsAmountPassed() {
-        SUT.fetchTriviaQuestionsAndNotify(QUESTIONS_AMOUNT)
+        SUT.fetchTriviaQuestionsAndNotify(QUESTIONS_AMOUNT, CATEGORY_ID)
 
         assertEquals(volleySingletonTd.questionsAmount, QUESTIONS_AMOUNT)
     }
@@ -52,7 +52,17 @@ internal class FetchTriviaQuestionsUseCaseTest {
     // endpoint is pass to request volley
     @Test
     internal fun fetchTriviaQuestionsAndNotify_endpointPassed() {
-        SUT.fetchTriviaQuestionsAndNotify(QUESTIONS_AMOUNT)
+        SUT.fetchTriviaQuestionsAndNotify(QUESTIONS_AMOUNT, CATEGORY_ID)
+
+        assertEquals(
+            volleySingletonTd.url,
+            triviaApiEndpointTd.getQuestionsEndpoint(QUESTIONS_AMOUNT, CATEGORY_ID)
+        )
+    }
+
+    @Test
+    internal fun fetchTriviaQuestionsAndNotify_endpointPassed_noCategory() {
+        SUT.fetchTriviaQuestionsAndNotify(QUESTIONS_AMOUNT, NO_CATEGORY_ID)
 
         assertEquals(
             volleySingletonTd.url,
@@ -66,7 +76,7 @@ internal class FetchTriviaQuestionsUseCaseTest {
         SUT.registerListener(listener)
         volleySingletonTd.callNotifySuccess = true
         volleySingletonTd.response = "wrong response"
-        SUT.fetchTriviaQuestionsAndNotify(QUESTIONS_AMOUNT)
+        SUT.fetchTriviaQuestionsAndNotify(QUESTIONS_AMOUNT, CATEGORY_ID)
 
         assertTrue(listener.onTriviaQuestionsFetchFailed)
         assertFalse(listener.onTriviaQuestionsFetched)
@@ -78,7 +88,7 @@ internal class FetchTriviaQuestionsUseCaseTest {
         SUT.registerListener(listener)
         volleySingletonTd.callNotifySuccess = true
         volleySingletonTd.response = RESPONSE
-        SUT.fetchTriviaQuestionsAndNotify(QUESTIONS_AMOUNT)
+        SUT.fetchTriviaQuestionsAndNotify(QUESTIONS_AMOUNT, CATEGORY_ID)
 
         assertTrue(listener.onTriviaQuestionsFetched)
         assertFalse(listener.onTriviaQuestionsFetchFailed)
@@ -89,7 +99,7 @@ internal class FetchTriviaQuestionsUseCaseTest {
     internal fun onTriviaQuestionsFetchFailed_failure_notifyError() {
         SUT.registerListener(listener)
         volleySingletonTd.callNotifyError = true
-        SUT.fetchTriviaQuestionsAndNotify(QUESTIONS_AMOUNT)
+        SUT.fetchTriviaQuestionsAndNotify(QUESTIONS_AMOUNT, CATEGORY_ID)
 
         assertTrue(listener.onTriviaQuestionsFetchFailed)
         assertFalse(listener.onTriviaQuestionsFetched)
@@ -103,7 +113,7 @@ internal class FetchTriviaQuestionsUseCaseTest {
         volleySingletonTd.callNotifySuccess = true
         volleySingletonTd.callNotifyError = true
         volleySingletonTd.response = RESPONSE
-        SUT.fetchTriviaQuestionsAndNotify(QUESTIONS_AMOUNT)
+        SUT.fetchTriviaQuestionsAndNotify(QUESTIONS_AMOUNT, CATEGORY_ID)
 
         assertTrue(listener.onTriviaQuestionsFetched)
         assertTrue(listener2.onTriviaQuestionsFetched)
@@ -140,6 +150,14 @@ internal class FetchTriviaQuestionsUseCaseTest {
     private class TriviaApiEndpointsTd : ITriviaApiEndpoints {
         override fun getQuestionsEndpoint(amount: String): String {
             return TRIVIA_API_URL + amount
+        }
+
+        override fun getQuestionsEndpoint(amount: String, category: Int): String {
+            return "$TRIVIA_API_URL$amount&category=$category"
+        }
+
+        override fun getCategoriesEndpoint(): String {
+            TODO("Not yet implemented")
         }
 
     }

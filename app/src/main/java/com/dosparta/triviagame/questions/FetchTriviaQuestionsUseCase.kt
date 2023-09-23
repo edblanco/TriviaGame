@@ -1,8 +1,9 @@
 package com.dosparta.triviagame.questions
 
 import com.android.volley.Request
+import com.dosparta.triviagame.categories.NO_CATEGORY_ID
 import com.dosparta.triviagame.common.BaseObservable
-import com.dosparta.triviagame.networking.IQuestionsSchemaParser
+import com.dosparta.triviagame.networking.parsers.IQuestionsSchemaParser
 import com.dosparta.triviagame.networking.ITriviaApiEndpoints
 import com.dosparta.triviagame.networking.IVolleySingleton
 import com.dosparta.triviagame.networking.schemas.QuestionsSchema
@@ -23,8 +24,8 @@ class FetchTriviaQuestionsUseCase(
     }
 
     //todo: test it against config changed
-    fun fetchTriviaQuestionsAndNotify(questionsAmount: String) {
-        val questionsEndpoint = triviaApiEndpoints.getQuestionsEndpoint(questionsAmount)
+    fun fetchTriviaQuestionsAndNotify(questionsAmount: String, category: Int) {
+        val questionsEndpoint = if (category != NO_CATEGORY_ID) triviaApiEndpoints.getQuestionsEndpoint(questionsAmount, category) else triviaApiEndpoints.getQuestionsEndpoint(questionsAmount)
         volleyInstance.addStringRequestToQueue(Request.Method.GET, questionsEndpoint, this)
     }
 
