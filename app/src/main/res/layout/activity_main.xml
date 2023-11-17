@@ -5,14 +5,13 @@
     android:id="@+id/parent_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/main_background_color"
+    style="@style/mainContainer"
     tools:context=".screens.trivia.TriviaGameActivity">
 
     <TextView
         android:id="@+id/title_text"
         style="@style/TitleTextStyle"
         android:text="@string/title_text"
-        android:textColor="@color/light_gray_txt_color"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -54,8 +53,7 @@
                 android:layout_marginStart="@dimen/small_margin"
                 android:layout_marginTop="@dimen/card_view_margin_top"
                 android:layout_marginEnd="@dimen/small_margin"
-                android:backgroundTint="@color/cardViewBackgroundTint"
-                android:elevation="@dimen/cardViewElevation"
+                style="@style/questionCard"
                 app:cardCornerRadius="@dimen/cardViewCornerRadius"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -64,7 +62,7 @@
 
                 <TextView
                     android:id="@+id/question_textview"
-                    style="@style/StandardTextMediumStyle.White"
+                    style="@style/StandardTextMediumStyle.OnBackground"
                     android:text="@string/loading_question"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
