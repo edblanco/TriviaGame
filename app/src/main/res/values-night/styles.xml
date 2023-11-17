@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="mainContainer" parent="AppTheme">
-        <item name="android:background">@color/md_theme_light_primaryContainer</item>
+        <item name="android:background">@color/md_theme_dark_primaryContainer</item>
     </style>
 
     <style name="mainSpinner" parent="AppTheme">
-        <item name="android:popupBackground">@color/md_theme_light_surfaceVariant</item>
-        <item name="android:backgroundTint">@color/md_theme_light_tertiary</item>
+        <item name="android:popupBackground">@color/md_theme_dark_surfaceVariant</item>
+        <item name="android:backgroundTint">@color/md_theme_dark_tertiary</item>
     </style>
 
     <style name="questionCard" parent="AppTheme">
-        <item name="android:backgroundTint">@color/md_theme_light_background</item>
+        <item name="android:backgroundTint">@color/md_theme_dark_background</item>
         <item name="android:elevation">@dimen/cardViewElevation</item>
     </style>
 
@@ -33,11 +33,11 @@
     </style>
 
     <style name="StandardTextMediumStyle.OnBackground" parent="StandardTextMediumStyle">
-        <item name="android:textColor">@color/md_theme_light_onBackground</item>
+        <item name="android:textColor">@color/md_theme_dark_onBackground</item>
     </style>
 
     <style name="StandardTextMediumStyle.OnSurfaceVariant" parent="StandardTextMediumStyle">
-        <item name="android:textColor">@color/md_theme_light_onSurfaceVariant</item>
+        <item name="android:textColor">@color/md_theme_dark_onSurfaceVariant</item>
     </style>
 
     <style name="ButtonStyle">

@@ -7,5 +7,5 @@
     android:layout_height="wrap_content"
     android:padding="8dp"
     android:ellipsize="marquee"
-    android:textColor="@color/md_theme_light_onSurfaceVariant"
+    android:textColor="@color/md_theme_dark_onSurfaceVariant"
     android:textSize="@dimen/normal_text_size"/>

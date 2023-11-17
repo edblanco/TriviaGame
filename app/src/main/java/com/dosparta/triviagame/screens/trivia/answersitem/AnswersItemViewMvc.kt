@@ -1,5 +1,6 @@
 package com.dosparta.triviagame.screens.trivia.answersitem
 
+import android.content.res.Configuration
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Button
@@ -18,8 +19,13 @@ class AnswersItemViewMvc(layoutInflater: LayoutInflater, parent: ViewGroup?, pri
     }
 
     override fun updateTintColor(isCorrect: Boolean) {
-        val color = uiConfig.getAnswerTintColor(isCorrect)
+        val color = uiConfig.getAnswerTintColor(isCorrect, isDarkModeActive())
         questionButton.backgroundTintList = getContext().resources.getColorStateList(color, null)
+    }
+
+    private fun isDarkModeActive(): Boolean {
+        val uiMode = getContext().resources?.configuration?.uiMode?.and(Configuration.UI_MODE_NIGHT_MASK)
+        return uiMode == Configuration.UI_MODE_NIGHT_YES
     }
 
     override fun bindAnswer(answer: Answer) {
