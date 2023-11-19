@@ -43,6 +43,7 @@ open class InfoDialog : BaseDialog() {
         mTxtMessage.text = requireArguments().getString(ARG_MESSAGE)
         mBtnPositive.text = requireArguments().getString(ARG_BUTTON_CAPTION)
         mBtnPositive.setOnClickListener { onButtonClicked() }
+        setTransparentBackground(dialog)
         return dialog
     }
 

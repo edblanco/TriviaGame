@@ -60,6 +60,7 @@ class PromptDialog : BaseDialog() {
         }
         btnPositive.setOnClickListener { onPositiveButtonClicked() }
         btnNegative.setOnClickListener { onNegativeButtonClicked() }
+        setTransparentBackground(dialog)
         return dialog
     }
 
