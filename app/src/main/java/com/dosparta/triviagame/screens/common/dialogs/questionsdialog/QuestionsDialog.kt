@@ -36,16 +36,16 @@ class QuestionsDialog(private var categories: List<TriviaCategoryIn>): BaseDialo
         val dialog = super.onCreateDialog(savedInstanceState)
         dialog.setContentView(R.layout.dialog_questions)
 
-        fillData(dialog)
+        setupScreen(dialog)
 
         return dialog
     }
 
-    private fun fillData(dialog: Dialog) {
+    private fun setupScreen(dialog: Dialog) {
         initMembers(dialog)
         fillSpinners()
         btnContinue.setOnClickListener { onContinueButtonClicked() }
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        setTransparentBackground(dialog)
     }
 
     private fun fillSpinners() {
